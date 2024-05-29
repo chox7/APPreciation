@@ -19,6 +19,6 @@
 3. **Aktywuj wirtualne środowisko:**
     
     ```bash
-    source .env/bin/activate  # dla macOS i Linux
-    .env\Scripts\activate     # dla Windows
+    source .venv/bin/activate  # dla macOS i Linux
+    .venv\Scripts\activate     # dla Windows
     ```

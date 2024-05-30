@@ -6,7 +6,7 @@
 
    ```bash
    git clone git@gitlab.com:neuroinf_uw_24/ekg_coherence.git
-   cd ekg_coherence.git
+   cd ekg_coherence
    ```
 
 2. **Uruchom skrypt instalacyjny:**

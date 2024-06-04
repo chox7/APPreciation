@@ -6,7 +6,7 @@ class HRProcessor:
     def __init__(self, sampling_rate=500, window_size=5):
         self.sampling_rate = sampling_rate
         self.window_size = window_size
-        self.data_buffer = deque(maxlen=sampling_rate * window_size)  # Buffer to hold last 10 seconds of data
+        self.data_buffer = deque(maxlen=sampling_rate * window_size)  
 
     def add_data(self, new_data):
         # Zakładam, że:

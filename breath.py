@@ -60,8 +60,9 @@ def creating_ramp(hold_zero= 10 , inhale=9, hold_one=7, exhale=8):
 
     return fig
 
-scheme = creating_ramp()
-scheme.show()
+if __name__ == '__main__':
+    scheme = creating_ramp()
+    scheme.show()
 
 
 

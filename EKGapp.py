@@ -29,7 +29,7 @@ def run_dash_app(processor):
         dcc.Graph(id='breathing-scheme', figure=creating_ramp()),
         dcc.Interval(
             id='interval-component',
-            interval=50,  # Aktualizacja co 1 sekundę
+            interval=50,  # Aktualizacja co 50 ms
             n_intervals=0
         )
     ])
@@ -38,7 +38,7 @@ def run_dash_app(processor):
         Output('live-update-graph', 'figure'),
         [Input('interval-component', 'n_intervals')]
     )
-    def update_graph_live(n):
+    def update_EKG_plot(n):
         data_buffer = processor.get_data()
         ekg_trace = go.Scatter(
             y=data_buffer,
@@ -50,7 +50,7 @@ def run_dash_app(processor):
             'data': [ekg_trace],
             'layout': go.Layout(
                 title='Live EKG Data',
-                #xaxis=dict(), TODO: Dodać czas na osi x
+                xaxis=dict(), #TODO: Dodać czas na osi x
                 yaxis=dict(range=[np.min(data_buffer)-200, np.max(data_buffer)+200])  # Dostosuj zakres osi Y do swoich danych
             )
         }

@@ -9,8 +9,12 @@ class HRProcessor:
         self.data_buffer = deque(maxlen=sampling_rate * window_size)  # Buffer to hold last 10 seconds of data
 
     def add_data(self, new_data):
-        eint_1 = new_data[:, 2] - new_data[:, 1]
-        self.data_buffer.extend(eint_1)
+        # Zakładam, że:
+        # kanał 2 posiada sygnał EKG z lewej nogi
+        # kanał 1 posiada sygnał EKG z prawej kończyny górnej (nadgarstek lub ramię)
+        # EINTHOVEN II = VF - VR
+        eint_2 = new_data[:, 2] - new_data[:, 1]
+        self.data_buffer.extend(eint_2)
     
     def get_data(self):
         return np.array(self.data_buffer)

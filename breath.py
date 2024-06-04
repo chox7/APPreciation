@@ -4,7 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 
-def creating_ramp(hold_zero = 15 , inhale = 10, hold_one = 15, exhale = 10, info_from_user = True, text_above_dot = False, speed = 2):
+def creating_ramp(hold_zero = 15 , inhale = 10, hold_one = 15, exhale = 10, speed = 2, info_from_user = True, text_above_dot = False):
 
     # scheme settings can be set in function or by the user
     if info_from_user:
@@ -92,8 +92,8 @@ def creating_ramp(hold_zero = 15 , inhale = 10, hold_one = 15, exhale = 10, info
     fig.update_traces(marker=dict(size=20, symbol= 'circle', color=["#6699CC"]))
     return fig
 
-#if _name_ == ”__main__”:
-scheme = creating_ramp()
-scheme.show()
+if _name_ == ”__main__”:
+    scheme = creating_ramp()
+    scheme.show()
 
 

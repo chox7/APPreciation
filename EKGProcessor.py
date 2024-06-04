@@ -13,8 +13,13 @@ class HRProcessor:
         # kanał 2 posiada sygnał EKG z lewej nogi
         # kanał 1 posiada sygnał EKG z prawej kończyny górnej (nadgarstek lub ramię)
         # EINTHOVEN II = VF - VR
+        #eint_2 = -1 * new_data[:,23]
         eint_2 = new_data[:, 2] - new_data[:, 1]
         self.data_buffer.extend(eint_2)
     
     def get_data(self):
         return np.array(self.data_buffer)
+    
+    def hr(self):
+        
+        

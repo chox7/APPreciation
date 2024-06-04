@@ -40,6 +40,7 @@ def run_dash_app(processor):
     )
     def update_EKG_plot(n):
         data_buffer = processor.get_data()
+        print(data_buffer.mean())
         ekg_trace = go.Scatter(
             y=data_buffer,
             mode='lines',
@@ -51,7 +52,7 @@ def run_dash_app(processor):
             'layout': go.Layout(
                 title='Live EKG Data',
                 xaxis=dict(), #TODO: Dodać czas na osi x
-                yaxis=dict(range=[np.min(data_buffer)-200, np.max(data_buffer)+200])  # Dostosuj zakres osi Y do swoich danych
+                yaxis=dict(range=[0.8 * np.min(data_buffer), 1.2 * np.max(data_buffer)+200])  # Dostosuj zakres osi Y do swoich danych
             )
         }
     return app

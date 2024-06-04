@@ -11,14 +11,22 @@
 
 2. **Uruchom skrypt instalacyjny:**
 
+    Dla macOS i Linux:
     ```bash
-    bash setup.sh # dla macOS i Linux
-    setup.bat      # dla Windows
+    bash setup.sh 
+    ```
+    Dla Windows:
+    ```bat
+    setup.bat      
     ```
 
 3. **Aktywuj wirtualne środowisko:**
-    
+
+    Dla macOS i Linux:
     ```bash
-    source .venv/bin/activate  # dla macOS i Linux
-    .venv\Scripts\activate     # dla Windows
+    source .venv/bin/activate 
+    ```
+    Dla Windows:
+    ```PowerShell
+    .venv\Scripts\activate
     ```

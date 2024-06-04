@@ -4,10 +4,8 @@ from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 from breath import creating_ramp
 import numpy as np
-import EKGProcessor as ekgp
 import lsl_perun32 as lsl
-import time
-import threading
+
 
 def add_data_continuously(HR, data, filts):
     '''
@@ -57,14 +55,3 @@ def run_dash_app(processor):
             )
         }
     return app
-
-def run_ekg_app(s_path, n_ch, Fs):
-    data = ts.test_signal(s_path, n_ch, Fs)
-    HR = ekgp.HRProcessor(sampling_rate=Fs, window_size=2)
-    filts = lsl.initialize_filters(500)
-
-    data_thread = threading.Thread(target=add_data_continuously, args=(HR, data, filts))
-    data_thread.start()
-
-    app = run_dash_app(HR)
-    app.run_server(debug=True, port=8051)

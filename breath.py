@@ -92,8 +92,9 @@ def creating_ramp(hold_zero = 15 , inhale = 10, hold_one = 15, exhale = 10, spee
     fig.update_traces(marker=dict(size=20, symbol= 'circle', color=["#6699CC"]))
     return fig
 
-if _name_ == ”__main__”:
+if __name__ == '__main__':
     scheme = creating_ramp()
     scheme.show()
+
 
 

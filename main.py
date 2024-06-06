@@ -1,24 +1,28 @@
 import lsl_perun32 as lsl
-import h5py
-import numpy as np
-import matplotlib.pyplot as plt
+import EKGProcessor as ekgp
+import EKGapp as ekgapp
+import threading
+import test_signal as ts
 
-path = 'dummy_data_120s.hdf'
-processing_chunk_size = 1024
-chosen_channels = [23, 24, 25, 26, 27, 28, 29]
+def main():
+    #path = 'dummy_data_120s.hdf'
+    #processing_chunk_size = 1024
+    #chosen_channels = [23, 24, 25, 26, 27, 28, 29]
+    #data = lsl.simulate_aquisition(path, processing_chunk_size)
 
+    Fs = 2048
+    n_ch = 3
+    s_path = 'wysilek.obci.raw'
 
-data = lsl.simulate_aquisition(path, processing_chunk_size)
-filts = lsl.initialize_filters(500)
+    data = ts.test_signal(s_path, n_ch, Fs)
+    filts = lsl.initialize_filters(500)
+    HR = ekgp.HRProcessor(sampling_rate=Fs, window_size=2)
 
-while 1:
-    piece = next(data)
-    chunk_filtered = lsl.filter_chunk(piece, filts)
-    # TUTAJ MOŻESZ KODOWAĆ DALEJ, RESZTY POSTARAJ SIĘ NIE DOTYKAĆ
+    data_thread = threading.Thread(target=ekgapp.add_data_continuously, args=(HR, data, filts))
+    data_thread.start()
 
-    '''
-    Chunk filtered posiada np.array o kształcie: (processing_chunk_size, liczba_kanałów=32)
-    Jest już przefiltrowany
-    lsl.simulate_aqusition zwraca generator, za każdym razem jak zadziałasz na niego funkcją next(), dostaniesz kolejny
-    chunk danych
-    '''
+    app = ekgapp.run_dash_app(HR)
+    app.run_server(debug=True, port=8051)
+
+if __name__ == '__main__':
+    main()

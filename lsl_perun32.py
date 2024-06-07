@@ -67,6 +67,7 @@ def simulate_aquisition(path, processing_chunk_size):
                 processing_chunk[start:stop, :] = 0.0715 * fil[chunk_id]['samples'][:][:, :]
                 last_n = stop
             else:
+                time.sleep(0.5)
                 yield processing_chunk
                 processing_chunk = np.empty((processing_chunk_size, 32), dtype=float)
                 last_n = 0

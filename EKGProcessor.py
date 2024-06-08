@@ -1,6 +1,9 @@
 import numpy as np
 from collections import deque
 from scipy.signal import find_peaks
+from scipy import interpolate
+import periodogram
+from scipy.signal import windows
 
 
 class HRVProcessor:
@@ -54,3 +57,27 @@ class HRVProcessor:
     
     def get_bpm(self):
         return np.array(self.bpm_list)
+    
+    def calculate_hrv(self):
+        if len(self.rr_intervals) < 5:
+            return
+    
+        avg_rr_interval = np.mean(self.rr_intervals)
+        bpm = int(60.0 / avg_rr_interval)
+        peaks_time = self.peaks_time
+
+        RR_new = interpolate.interp1d(peaks_time, bpm, kind='linear')
+        sig = RR_new(peaks_time)
+        t2 = np.arange(1,120,1)
+        p = np.polyfit(t2, RR_new(t2), 2)
+        f = np.polyval(p,t2)
+        hrv = RR_new(t2) - f
+        self.hrv_list.extend([hrv])
+        okno = windows.hann(len(t2))
+        (F, P) = periodogram(sig, okno, 1)
+        self.hrv_list.extend([hrv])
+
+
+
+    def get_hrv(self):
+        return np.array(self.hrv_list)

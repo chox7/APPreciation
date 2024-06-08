@@ -71,11 +71,10 @@ class HRVProcessor:
         t2 = np.arange(1,120,1)
         p = np.polyfit(t2, RR_new(t2), 2)
         f = np.polyval(p,t2)
-        hrv = RR_new(t2) - f
-        self.hrv_list.extend([hrv])
+        sig = RR_new(t2) - f
         okno = windows.hann(len(t2))
         (F, P) = periodogram(sig, okno, 1)
-        self.hrv_list.extend([hrv])
+        return (F,P)
 
 
 

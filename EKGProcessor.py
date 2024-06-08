@@ -17,6 +17,8 @@ class HRVProcessor:
         self.peaks_time = deque(maxlen=5)
         self.peaks_prominence = deque(maxlen=5)
         self.bpm_list = deque(maxlen=10)
+        self.frequencies_list = deque(maxlen=50)
+        self.power_list = deque(maxlen=50)
 
     def add_data(self, new_data):
         self.data_buffer.extend(new_data)
@@ -59,7 +61,7 @@ class HRVProcessor:
         return np.array(self.bpm_list)
     
     def calculate_hrv(self):
-        if len(self.rr_intervals) < 5:
+        if len(self.rr_intervals) < 10:
             return
     
         avg_rr_interval = np.mean(self.rr_intervals)
@@ -73,10 +75,12 @@ class HRVProcessor:
         f = np.polyval(p,t2)
         sig = RR_new(t2) - f
         okno = windows.hann(len(t2))
-        (F, P) = periodogram(sig, okno, 1)
-        return (F,P)
+        (F, P) = periodogram(sig, okno, 1)    
+        self.frequencies_list.extend([F])
+        self.power_list.extend([P])
 
-
-
-    def get_hrv(self):
-        return np.array(self.hrv_list)
+        def get_frequencies(self):
+            return np.array(self.frequencies_list)
+        
+        def get_frequencies(self):
+            return np.array(self.power_list)

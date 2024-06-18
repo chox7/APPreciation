@@ -32,7 +32,7 @@ Tutaj wstawimy zdjęcia/filmik jak działa aplikacja.
     ```
     Dla Windows:
     ```bat
-    setup.bat      
+    .\setup.bat      
     ```
 
 3. **Aktywuj wirtualne środowisko:**

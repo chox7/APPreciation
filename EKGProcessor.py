@@ -17,8 +17,8 @@ class HRVProcessor:
         self.peaks_time = deque(maxlen=5)
         self.peaks_prominence = deque(maxlen=5)
         self.bpm_list = deque(maxlen=10)
-        self.frequencies_list = deque(maxlen=50)
-        self.power_list = deque(maxlen=50)
+        self.frequencies_list = deque(maxlen=10)
+        self.power_list = deque(maxlen=10)
 
     def add_data(self, new_data):
         self.data_buffer.extend(new_data)
@@ -61,7 +61,7 @@ class HRVProcessor:
         return np.array(self.bpm_list)
     
     def calculate_hrv(self):
-        if len(self.rr_intervals) < 10:
+        if len(self.rr_intervals) < 5:
             return
     
         avg_rr_interval = np.mean(self.rr_intervals)
@@ -70,7 +70,7 @@ class HRVProcessor:
 
         RR_new = interpolate.interp1d(peaks_time, bpm, kind='linear')
         sig = RR_new(peaks_time)
-        t2 = np.arange(1,120,1)
+        t2 = np.arange(1,20,1)
         p = np.polyfit(t2, RR_new(t2), 2)
         f = np.polyval(p,t2)
         sig = RR_new(t2) - f
@@ -79,8 +79,8 @@ class HRVProcessor:
         self.frequencies_list.extend([F])
         self.power_list.extend([P])
 
-        def get_frequencies(self):
-            return np.array(self.frequencies_list)
+    def get_frequencies(self):
+        return np.array(self.frequencies_list)
         
-        def get_frequencies(self):
-            return np.array(self.power_list)
+    def get_power(self):
+        return np.array(self.power_list)

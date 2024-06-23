@@ -25,8 +25,9 @@ def add_data_continuously(HR, data, filts):
 def run_dash_app(processor):
     app = dash.Dash(__name__)
     app.layout = html.Div([
-        dcc.Graph(id='live-graph-ekg', style={'width': '66%', 'display': 'inline-block'}),
+        dcc.Graph(id='live-graph-ekg', style={'width': '33%', 'display': 'inline-block'}),
         dcc.Graph(id='live-graph-hr', style={'width': '33%', 'display': 'inline-block'}),
+        dcc.Graph(id='live-graph-hrv', style={'width': '33%', 'display': 'inline-block'}),
         dcc.Graph(id='breathing-scheme', figure=creating_ramp(info_from_user = False)),
         dcc.Interval(
             id='interval-component',
@@ -81,6 +82,7 @@ def run_dash_app(processor):
                 )
             )
         }
+    
     @app.callback(Output('live-graph-hr', 'figure'),
               Input('interval-component', 'n_intervals'))
     def update_HR_plot(n):
@@ -105,6 +107,38 @@ def run_dash_app(processor):
                     gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
                     linecolor='black',  # Linia osi Y w kolorze czarnym
                     range=[20,300]  # Zakres tętna w BPM (dostosuj do potrzeb)
+                )
+            )
+        }
+    
+
+    @app.callback(Output('live-graph-hrv', 'figure'),
+              Input('interval-component', 'n_intervals'))
+    def update_HRV_plot(n):
+        F = processor.get_frequencies()
+        P = processor.get_power()
+        hrv_trace = go.Scatter(
+            x=F,
+            y=P,
+            mode='lines',
+            name='Heart Rate Variability'
+        )
+        
+        return {
+            'data': [hrv_trace],
+            'layout': go.Layout(
+                title='Live Heart Rate Variability',
+                plot_bgcolor='white',  # Białe tło wykresu
+                paper_bgcolor='white',  # Białe tło papieru
+                xaxis=dict(
+                    gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
+                    linecolor='black',
+                    range = [0,0.55]  # Zakres osi częstotliwości
+                ),
+                yaxis=dict(
+                    gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
+                    linecolor='black',  # Linia osi Y w kolorze czarnym
+                    #range=[0,300]  # Zakres osi mocy
                 )
             )
         }

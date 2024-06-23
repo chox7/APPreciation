@@ -115,8 +115,8 @@ def run_dash_app(processor):
     @app.callback(Output('live-graph-hrv', 'figure'),
               Input('interval-component', 'n_intervals'))
     def update_HRV_plot(n):
-        P = processor.get_frequencies()
-        F = processor.get_power()
+        F = processor.get_frequencies()
+        P = processor.get_power()
         hrv_trace = go.Scatter(
             x=F,
             y=P,
@@ -133,12 +133,12 @@ def run_dash_app(processor):
                 xaxis=dict(
                     gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
                     linecolor='black',
-                    range = [0,0.5]  # Zakres osi częstotliwości
+                    range = [0,0.55]  # Zakres osi częstotliwości
                 ),
                 yaxis=dict(
                     gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
                     linecolor='black',  # Linia osi Y w kolorze czarnym
-                    range=[0,300]  # Zakres osi mocy
+                    #range=[0,300]  # Zakres osi mocy
                 )
             )
         }

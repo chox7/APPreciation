@@ -2,7 +2,7 @@ import numpy as np
 from collections import deque
 from scipy.signal import find_peaks
 from scipy import interpolate
-import periodogram
+from periodogram import periodogram
 from scipy.signal import windows
 
 
@@ -11,14 +11,15 @@ class HRVProcessor:
         self.sampling_rate = sampling_rate
         self.window_size = window_size
         self.data_buffer = deque(maxlen=sampling_rate * window_size)
-        self.rr_intervals = deque(maxlen=5) # 5 last rr intervals
+        self.rr_intervals = deque(maxlen=20) # 5 last rr intervals
         self.time_buffer = np.linspace(0, window_size, sampling_rate * window_size)
         self.last_peak_index = -1 # index of the last peak in the data_buffer in seconds
-        self.peaks_time = deque(maxlen=5)
-        self.peaks_prominence = deque(maxlen=5)
-        self.bpm_list = deque(maxlen=10)
-        self.frequencies_list = deque(maxlen=10)
-        self.power_list = deque(maxlen=10)
+        self.peaks_time = deque(maxlen=21)
+        self.peaks_prominence = deque(maxlen=20)
+        self.bpm_list = deque(maxlen=20)
+        self.time_list = deque(maxlen=20)
+        self.frequencies_list = deque(maxlen=20)
+        self.power_list = deque(maxlen=20)
 
     def add_data(self, new_data):
         self.data_buffer.extend(new_data)
@@ -48,36 +49,45 @@ class HRVProcessor:
                 rr_interval = np.diff(self.peaks_time)
                 self.rr_intervals.extend(rr_interval)
                 self.calculate_bpm()
+                self.calculate_hrv()
                 
     def calculate_bpm(self):
-        if len(self.rr_intervals) < 5:
+        if len(self.rr_intervals) < 1:
             return
     
         avg_rr_interval = np.mean(self.rr_intervals)
         bpm = int(60.0 / avg_rr_interval)
         self.bpm_list.extend([bpm])
-    
+
+        #potrzebne do hrv
+        time = [self.peaks_time[i]/500 for i in range(len(self.peaks_time)-1)]
+        self.time_list = time
+
     def get_bpm(self):
         return np.array(self.bpm_list)
     
     def calculate_hrv(self):
         if len(self.rr_intervals) < 5:
             return
-    
-        avg_rr_interval = np.mean(self.rr_intervals)
-        bpm = int(60.0 / avg_rr_interval)
-        peaks_time = self.peaks_time
+        bpm = self.bpm_list
+        time = self.time_list
+        RR_new = interpolate.interp1d(time, bpm, kind='linear')
+        sig = RR_new(time)
 
-        RR_new = interpolate.interp1d(peaks_time, bpm, kind='linear')
-        sig = RR_new(peaks_time)
-        t2 = np.arange(1,20,1)
+        # tutaj trzeba odjąć wielomian...
+        '''T = ?
+        t2 = np.arange(1,T,1)
         p = np.polyfit(t2, RR_new(t2), 2)
         f = np.polyval(p,t2)
-        sig = RR_new(t2) - f
-        okno = windows.hann(len(t2))
+        sig = RR_new(t2) - f'''
+
+        # odejmę stałą, bo wielomian mi nie wychodzi
+        sig = sig - np.mean(sig)
+
+        okno = windows.hann(len(time))
         (F, P) = periodogram(sig, okno, 1)    
-        self.frequencies_list.extend([F])
-        self.power_list.extend([P])
+        self.frequencies_list = F
+        self.power_list = P
 
     def get_frequencies(self):
         return np.array(self.frequencies_list)

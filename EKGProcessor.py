@@ -21,6 +21,7 @@ class HRVProcessor:
         self.frequencies = deque(maxlen=20)
         self.power = deque(maxlen=20)
         self.coherence = deque(maxlen=1000)
+        self.x_coherence = np.linspace(-4, 4, 1000)
 
     def add_data(self, new_data):
         self.data_buffer.extend(new_data)
@@ -108,10 +109,7 @@ class HRVProcessor:
         highest_peak_index = np.argmax(self.frequencies[1:6])
         peak_power = integrate.simps(self.frequencies[(highest_peak_index-1):(highest_peak_index+1)])
         coherence_value  = (peak_power/(total_power-peak_power))**2
-        sigma = 1
-        mu=0
-        x = np.linspace(mu - 4*sigma, mu + 4*sigma, 1000)
-        self.coherence = ((1 / (sigma * np.sqrt(2 * np.pi))) * np.exp(-((x - mu)**2) / (2 * sigma**2)))/0.4*coherence_value
+        self.coherence = ((1 / (np.sqrt(2 * np.pi))) * np.exp(-(self.x_coherence**2) / 2))/0.4*coherence_value
 
     def get_coherence(self):
-        return np.array(self.coherence)
+        return (np.array(self.x_coherence), np.array(self.coherence))

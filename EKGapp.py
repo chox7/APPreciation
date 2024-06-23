@@ -149,8 +149,9 @@ def run_dash_app(processor):
     @app.callback(Output('live-graph-coherence', 'figure'),
               Input('interval-component', 'n_intervals'))
     def update_HRV_plot(n):
-        coh = processor.get_coherence()
+        x, coh = processor.get_coherence()
         coherence_trace = go.Scatter(
+            x=x,
             y=coh,
             mode='lines',
             name='Coherence'
@@ -164,8 +165,8 @@ def run_dash_app(processor):
                 paper_bgcolor='white',  # Białe tło papieru
                 xaxis=dict(
                     gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
-                    linecolor='black',
-                    range = [0,1000],  # Zakres osi częstotliwości
+                    linecolor='lightgray',
+                    range = [-4,4],  # Zakres osi częstotliwości
                     showticklabels=False
                 ),
                 yaxis=dict(

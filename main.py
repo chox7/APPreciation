@@ -5,14 +5,15 @@ import threading
 import test_signal as ts
 
 def main():
-    path = 'dummy_data_120s.hdf'
-    processing_chunk_size = 1024
-    chosen_channels = [23, 24, 25, 26, 27, 28, 29]
+    #path = 'dummy_data_120s.hdf'
+    #processing_chunk_size = 1024
+    #chosen_channels = [23, 24, 25, 26, 27, 28, 29]
     #data = lsl.simulate_aquisition(path, processing_chunk_size)
 
     data = ts.test_signal()
+    Fs = 2048
     filts = lsl.initialize_filters(500)
-    HR = ekgp.HRVProcessor(sampling_rate=2048, window_size=1)
+    HR = ekgp.HRVProcessor(sampling_rate=Fs, window_size=1)
 
     data_thread = threading.Thread(target=ekgapp.add_data_continuously, args=(HR, data, filts))
     data_thread.start()

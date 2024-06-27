@@ -25,9 +25,10 @@ def add_data_continuously(HR, data, filts):
 def run_dash_app(processor):
     app = dash.Dash(__name__)
     app.layout = html.Div([
-        dcc.Graph(id='live-graph-ekg', style={'width': '33%', 'display': 'inline-block'}),
-        dcc.Graph(id='live-graph-hr', style={'width': '33%', 'display': 'inline-block'}),
-        dcc.Graph(id='live-graph-hrv', style={'width': '33%', 'display': 'inline-block'}),
+        dcc.Graph(id='live-graph-ekg', style={'width': '25%', 'display': 'inline-block'}),
+        dcc.Graph(id='live-graph-hr', style={'width': '25%', 'display': 'inline-block'}),
+        dcc.Graph(id='live-graph-hrv', style={'width': '25%', 'display': 'inline-block'}),
+        dcc.Graph(id='live-graph-coherence', style={'width': '25%', 'display': 'inline-block'}),
         dcc.Graph(id='breathing-scheme', figure=creating_ramp(info_from_user = False)),
         dcc.Interval(
             id='interval-component',
@@ -139,6 +140,39 @@ def run_dash_app(processor):
                     gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
                     linecolor='black',  # Linia osi Y w kolorze czarnym
                     #range=[0,300]  # Zakres osi mocy
+                )
+            )
+        }
+    
+
+
+    @app.callback(Output('live-graph-coherence', 'figure'),
+              Input('interval-component', 'n_intervals'))
+    def update_HRV_plot(n):
+        x, coh = processor.get_coherence()
+        coherence_trace = go.Scatter(
+            x=x,
+            y=coh,
+            mode='lines',
+            name='Coherence'
+        )
+        
+        return {
+            'data': [coherence_trace],
+            'layout': go.Layout(
+                title='Coherence',
+                plot_bgcolor='white',  # Białe tło wykresu
+                paper_bgcolor='white',  # Białe tło papieru
+                xaxis=dict(
+                    gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
+                    linecolor='lightgray',
+                    range = [-4,4],  # Zakres osi częstotliwości
+                    showticklabels=False
+                ),
+                yaxis=dict(
+                    gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
+                    linecolor='lightgray',  # Linia osi Y w kolorze czarnym
+                    range=[0,1]  # Zakres osi mocy
                 )
             )
         }

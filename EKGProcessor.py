@@ -115,7 +115,23 @@ class HRVProcessor:
         self.power_list = P
 
     def get_frequencies(self):
-        return np.array(self.frequencies_list)
+        return np.array(self.frequencies)
         
     def get_power(self):
-        return np.array(self.power_list)
+        return np.array(self.power)
+    
+
+    ''' frequencies: [0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5 ] '''
+    
+    def calculate_coherence(self):
+        if len(self.frequencies) < 9:
+            return
+        
+        total_power = integrate.simps(self.frequencies[1:-2])
+        highest_peak_index = np.argmax(self.frequencies[1:6])
+        peak_power = integrate.simps(self.frequencies[(highest_peak_index-1):(highest_peak_index+1)])
+        coherence_value  = (peak_power/(total_power-peak_power))**2
+        self.coherence = ((1 / (np.sqrt(2 * np.pi))) * np.exp(-(self.x_coherence**2) / 2))/0.4*coherence_value
+
+    def get_coherence(self):
+        return (np.array(self.x_coherence), np.array(self.coherence))

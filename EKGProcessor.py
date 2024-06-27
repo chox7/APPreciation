@@ -3,6 +3,7 @@ from collections import deque
 from scipy.signal import find_peaks
 from scipy import interpolate
 from scipy.signal import windows
+from scipy import integrate
 
 class HRVProcessor:
     def __init__(self, sampling_rate=500, window_size=5, find_peaks_setting=None):
@@ -26,8 +27,9 @@ class HRVProcessor:
         self.peaks_time = deque(maxlen=self.bmp_size)
         self.peaks_prominence = deque(maxlen=self.bmp_size)
         self.bpm_list = deque(maxlen=self.bmp_size)
-        self.frequencies_list = None
-        self.power_list = None
+        self.frequencies = None
+        self.power = None
+        self.x_coherence = np.linspace(-4, 4, 1000)
 
     def add_data(self, new_data):
         self.data_buffer.extend(new_data)
@@ -111,17 +113,14 @@ class HRVProcessor:
         sig = RR_new(t2) - f
         okno = windows.hann(len(t2))
         F, P = self.periodogram(sig, okno, Fs_2)   
-        self.frequencies_list = F
-        self.power_list = P
+        self.frequencies = F
+        self.power = P
 
     def get_frequencies(self):
         return np.array(self.frequencies)
         
     def get_power(self):
         return np.array(self.power)
-    
-
-    ''' frequencies: [0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5 ] '''
     
     def calculate_coherence(self):
         if len(self.frequencies) < 9:

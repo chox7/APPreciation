@@ -50,3 +50,7 @@ Tutaj wstawimy zdjęcia/filmik jak działa aplikacja.
 1. Po uruchomieniu aplikacji naciśnij start, aby rozpocząć ćwiczenie oddechowe.
 2. Oddychaj zgodnie ze schematem: gdy piłeczka porusza się w górę weź wdech, gdy porusza się poziomo wstrzymaj oddech, a gdy porusza się w dół zrób wydech.
 3. Jeśli prędkość oddychania Ci nie odpowiada, możesz zmienić ją w ustawieniach.
+
+## Literatura
+1. Materiały ze strony brain.fuw.edu.pl do Pracowni Sygnałów Bioelektrycznych
+2. "The Coherent Heart" - publikacja Institute of HeartMath

@@ -143,12 +143,10 @@ def run_dash_app(processor):
                 )
             )
         }
-    
-
 
     @app.callback(Output('live-graph-coherence', 'figure'),
               Input('interval-component', 'n_intervals'))
-    def update_HRV_plot(n):
+    def update_coherence_plot(n):
         x, coh = processor.get_coherence()
         coherence_trace = go.Scatter(
             x=x,

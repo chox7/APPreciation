@@ -19,7 +19,7 @@ def add_data_continuously(inlet, samps_per_chunk, HR, filts):
         try:
             sample, timestamp = inlet.pull_chunk(timeout=1.0, max_samples=samps_per_chunk)
             piece = np.array(sample)
-            chunk_filtered = lsl.filter_chunk(piece, filts)
+            chunk_filtered = lsl.filter_chunk(piece[:, 23], filts)
             HR.add_data(chunk_filtered)
         except StopIteration:
             break    

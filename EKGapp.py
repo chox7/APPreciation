@@ -58,17 +58,17 @@ def run_dash_app(processor):
             name=f'EKG Signal',
         )
         
-        #peaks, prominences = processor.get_peaks()
-        #shapes = []
-        #for peak, prominence in zip(peaks, prominences):
-        #    shapes.append(
-        #        dict(
-        #            type="line",
-        #            x0=peak, y0=-200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)] - prominence,
-        #            x1=peak, y1=200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)],
-        #            line=dict(color="orange", width=2)
-        #        )
-        #    )
+        peaks, prominences = processor.get_peaks()
+        shapes = []
+        for peak, prominence in zip(peaks, prominences):
+            shapes.append(
+                dict(
+                    type="line",
+                    x0=peak, y0=-200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)] - prominence,
+                    x1=peak, y1=200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)],
+                    line=dict(color="orange", width=2)
+                )
+            )
         
         t2 = time.time()
         #print("EKG plot time:", t2-t1)

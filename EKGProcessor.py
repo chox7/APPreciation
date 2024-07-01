@@ -25,7 +25,7 @@ class HRVProcessor:
         self.current_time = 0
         self.last_peak_index = -1 # index of the last peak in the data_buffer in seconds
 
-        self.bmp_size = 100
+        self.bmp_size = 300
         self.rr_intervals = deque(maxlen=self.bmp_size-1) 
         self.peaks_time = deque(maxlen=self.bmp_size)
         self.peaks_prominence = deque(maxlen=self.bmp_size)
@@ -160,17 +160,16 @@ class HRVProcessor:
             RR = np.array(self.rr_intervals) * self.sampling_rate
             RR_new = interpolate.interp1d(peaks[:-1], 1/RR, kind='linear')
 
-        Fs_2 = self.sampling_rate
+        Fs_2 = 1
         t2 = np.arange(self.peaks_time[0], self.peaks_time[-2], 1/Fs_2)
         p = np.polyfit(t2, RR_new(t2), deg=2)
         f = np.polyval(p, t2)
         sig = RR_new(t2) - f
         okno = windows.hann(len(t2))
         F, P = self.periodogram(sig, okno, Fs_2)   
-
         with self.hrv_lock:
             self.frequencies = F
-            self.power = P
+            self.power = P  
 
     def get_frequencies(self):
         with self.hrv_lock: 
@@ -187,14 +186,28 @@ class HRVProcessor:
             time.sleep(5)
 
     def calculate_coherence(self):
-        with self.hrv_lock:
+        with self.coh_lock:
             if self.frequencies is None:
                 return
-            total_power = integrate.simps(self.frequencies[1:-2])
-            highest_peak_index = np.argmax(self.frequencies[1:6])
-            peak_power = integrate.simps(self.frequencies[(highest_peak_index-1):(highest_peak_index+1)])
+            F = self.get_frequencies()
+            P = self.get_power()
+
+            mask1 = (F > 0.04) & (F < 0.26)
+            F1 = F[mask1]
+            P1 = P[mask1]
+            highest_peak_index = np.argmax(P1)
+            highest_peak_frame = [P1[highest_peak_index] - 0.015, P1[highest_peak_index] + 0.015]
+            highest_peak_arr = (P1 > highest_peak_frame[0]) & (P1 < highest_peak_frame[1])
+            peak_power = integrate.simps(P1[highest_peak_arr], F1[highest_peak_arr])
+
+            mask2 = (F > 0.0033) & (F < 0.4)
+            F2 = F[mask2]
+            P2 = P[mask2]
+            total_power = integrate.simps(P2, F2)           
             coherence_value  = (peak_power/(total_power-peak_power))**2
-            self.coherence = ((1 / (np.sqrt(2 * np.pi))) * np.exp(-(self.x_coherence**2) / 2))/0.4*coherence_value
+            self.coherence = ((1 / (np.sqrt(2 * np.pi))) * np.exp(-(self.x_coherence**2) / 2))
+            self.coherence /= np.max(self.coherence)
+            self.coherence *= coherence_value
 
     def get_coherence(self):
         with self.coh_lock:

@@ -5,6 +5,7 @@ import plotly.graph_objs as go
 from breath import creating_ramp
 import numpy as np
 import lsl_perun32 as lsl
+import time
 
 
 def add_data_continuously(HR, data, filts):
@@ -21,6 +22,10 @@ def add_data_continuously(HR, data, filts):
             HR.add_data(chunk_filtered)
         except StopIteration:
             break    
+
+def run_dash_app_thread(HR):
+    app = run_dash_app(HR)
+    app.run_server(debug=True, port=8052, use_reloader=False)
 
 def run_dash_app(processor):
     app = dash.Dash(__name__)
@@ -42,6 +47,7 @@ def run_dash_app(processor):
         [Input('interval-component', 'n_intervals')]
     )
     def update_EKG_plot(n):
+        t1 = time.time()
         data_buffer, time_buffer = processor.get_data()
 
         ekg_trace = go.Scatter(
@@ -51,24 +57,25 @@ def run_dash_app(processor):
             name=f'EKG Signal',
         )
         
-        peaks, prominences = processor.get_peaks()
-        shapes = []
-        for peak, prominence in zip(peaks, prominences):
-            shapes.append(
-                dict(
-                    type="line",
-                    x0=peak, y0=-200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)] - prominence,
-                    x1=peak, y1=200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)],
-                    line=dict(color="orange", width=2)
-                )
-            )
+        #peaks, prominences = processor.get_peaks()
+        #shapes = []
+        #for peak, prominence in zip(peaks, prominences):
+        #    shapes.append(
+        #        dict(
+        #            type="line",
+        #            x0=peak, y0=-200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)] - prominence,
+        #            x1=peak, y1=200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)],
+        #            line=dict(color="orange", width=2)
+        #        )
+        #    )
         
-
+        t2 = time.time()
+        #print("EKG plot time:", t2-t1)
         return {
             'data': [ekg_trace],
             'layout': go.Layout(
                 title=f'Live EKG Data',
-                shapes=shapes,
+                #shapes=shapes,
                 plot_bgcolor='white',  # Białe tło wykresu
                 paper_bgcolor='white',  # Białe tło papieru
                 xaxis=dict(
@@ -117,7 +124,9 @@ def run_dash_app(processor):
               Input('interval-component', 'n_intervals'))
     def update_HRV_plot(n):
         F = processor.get_frequencies()
+        F = F[F<0.7]
         P = processor.get_power()
+        P = P[:len(F)]
         hrv_trace = go.Scatter(
             x=F,
             y=P,

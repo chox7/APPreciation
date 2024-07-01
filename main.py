@@ -12,14 +12,14 @@ def main():
 
     data = ts.test_signal()
     Fs = 2048
-    filts = lsl.initialize_filters(500)
+    filts = lsl.initialize_filters(Fs)
     HR = ekgp.HRVProcessor(sampling_rate=Fs, window_size=1)
 
     data_thread = threading.Thread(target=ekgapp.add_data_continuously, args=(HR, data, filts))
+    data_thread.setDaemon(True)
     data_thread.start()
 
-    app = ekgapp.run_dash_app(HR)
-    app.run_server(debug=True, port=8051)
+    ekgapp.run_dash_app_thread(HR)
 
 if __name__ == '__main__':
     main()

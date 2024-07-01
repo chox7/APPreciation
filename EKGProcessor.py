@@ -225,7 +225,7 @@ class HRVAnalyzer:
             RR_new = interpolate.interp1d(peaks[:-1], 1/RR, kind='linear')
 
         Fs_2 = 1
-        t2 = np.arange(peaks[0], self.peaks[-2], 1/Fs_2)
+        t2 = np.arange(peaks[0], peaks[-2], 1/Fs_2)
         p = np.polyfit(t2, RR_new(t2), deg=2)
         t2 = np.arange(peaks[0], peaks[-2], 1/Fs_2)
         p = np.polyfit(t2, RR_new(t2), deg=3)

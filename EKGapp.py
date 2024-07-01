@@ -7,13 +7,19 @@ import numpy as np
 import lsl_perun32 as lsl
 
 
-def add_data_continuously(HR, data, filts):
+def add_data_continuously(inlet, samps_per_chunk, HR, filts):
+    '''
+    Chunk filtered posiada np.array o kształcie: (processing_chunk_size, liczba_kanałów=32)
+    Jest już przefiltrowany
+    lsl.simulate_aqusition zwraca generator, za każdym razem jak zadziałasz na niego funkcją next(), dostaniesz kolejny
+    chunk danych
+    '''
     while True:
         try:
-            piece = next(data)
-            piece = piece[:]
-            #chunk_filtered = lsl.filter_chunk(piece, filts)
-            HR.add_data(piece)
+            sample, timestamp = inlet.pull_chunk(timeout=1.0, max_samples=samps_per_chunk)
+            piece = np.array(sample)
+            chunk_filtered = lsl.filter_chunk(piece[:, 23], filts)
+            HR.add_data(chunk_filtered)
         except StopIteration:
             break    
 

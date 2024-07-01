@@ -7,7 +7,7 @@ import scipy.signal as ss
 # NIE RUSZAĆ!
 
 
-def start_stream(save_path, stream_name, samps_per_chunk):
+def start_stream(stream_name, samps_per_chunk):
     '''
     Rozpoczęcie streamu z Peruna 32.
     :param save_path: Ścieżka zapisu danych
@@ -30,23 +30,7 @@ def start_stream(save_path, stream_name, samps_per_chunk):
 
     inlet = StreamInlet(selected_stream)
 
-    # Zapis danych w formacie .hdf
-    with h5py.File(save_path, "a") as fil:
-        i = 0
-        time_beg = time.monotonic()
-        while True:
-            fil.create_group(str(i))
-            # pobieramy próbki (w mikrowoltach)
-            sample, timestamp = inlet.pull_chunk(timeout=1.0, max_samples=samps_per_chunk)
-            samps = np.array(sample)
-            times = np.array(timestamp)
-            fil[str(i)].create_dataset('samples', data=samps, dtype=float)
-            fil[str(i)].create_dataset('timestamp', data=times, dtype=float)
-            print(len(sample), len(timestamp), time.monotonic())
-            time_curr = time.monotonic()
-            if time_curr-time_beg > 120:
-                break
-            i += 1
+    return inlet
 
 
 def simulate_aquisition(path, processing_chunk_size):
@@ -76,7 +60,7 @@ def simulate_aquisition(path, processing_chunk_size):
 
 def initialize_filters(fs=500):
     # HP
-    order = 3
+    order = 4
     fc = 0.67
     rp = 0.5
     rs = 3
@@ -87,13 +71,20 @@ def initialize_filters(fs=500):
     rs = 3
     lp = ss.iirfilter(order, fc, rs=rs, btype='lowpass', ftype='butter', output='ba', fs=fs)
     # notch
-    notch = ss.iirnotch(50, Q=50/5, fs=fs)
-    fil = [hp, lp, notch]
+    notch_50 = ss.iirnotch(50, Q=50/5, fs=fs)
+    #notch_100 = ss.iirnotch(100, Q=50/5, fs=fs)
+    fil = [hp, lp, notch_50]
     return fil
 
 
 def filter_chunk(sig, filters):
-    for params in filters:
+    for j, params in enumerate(filters):
+        if j:
+            sig = y
         b, a = params
-        sig = ss.filtfilt(b, a, sig, axis=0)
-    return sig
+        zi = ss.lfilter_zi(b, a)
+        y = np.zeros(np.shape(sig))
+        for i, s in enumerate(sig):
+            y_tmp, zi = ss.lfilter(b, a, [s], zi=zi)
+            y[i] = y_tmp[-1]
+    return y

@@ -10,7 +10,7 @@ def main():
     #chosen_channels = [23, 24, 25, 26, 27, 28, 29]
     #data = lsl.simulate_aquisition(path, processing_chunk_size)
 
-    data = ts.test_signal()
+    inlet = lsl.start_stream('stream_1', 500)
     Fs = 500
     filts = lsl.initialize_filters(Fs)
     processor = ekgp.SignalProcessor(sampling_rate=Fs, buffor_size_seconds=5)

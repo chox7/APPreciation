@@ -3,6 +3,7 @@ from collections import deque
 from scipy.signal import find_peaks
 from scipy import interpolate
 from scipy.signal import windows
+import scipy.signal as ss
 from scipy import integrate
 import threading
 import time
@@ -11,8 +12,10 @@ class HRVProcessor:
     def __init__(self, sampling_rate=500, window_size=5, find_peaks_setting=None):
         if find_peaks_setting is None:
             self.find_peaks_setting = {
-                'prominence': 500,
-                'width': [10,100]
+                'prominence': 1000,
+                'width': [10, 100],
+                'height': 500,  
+                'distance': 200 
             }
         else:
             self.find_peaks_setting = find_peaks_setting
@@ -25,7 +28,7 @@ class HRVProcessor:
         self.current_time = 0
         self.last_peak_index = -1 # index of the last peak in the data_buffer in seconds
 
-        self.bmp_size = 300
+        self.bmp_size = 100
         self.rr_intervals = deque(maxlen=self.bmp_size-1) 
         self.peaks_time = deque(maxlen=self.bmp_size)
         self.peaks_prominence = deque(maxlen=self.bmp_size)
@@ -54,9 +57,27 @@ class HRVProcessor:
         self.hrv_thread.start()
         self.coh_thread.start()
 
+        # HP
+        order = 3
+        fc = 0.67
+        rp = 0.5
+        rs = 3
+        self.b_h, self.a_h = ss.iirfilter(order, fc, rp, rs, btype='highpass', ftype='butter', output='ba', fs=sampling_rate)
+        self.zi_h = ss.lfilter_zi(self.b_h, self.a_h)
+        # LP
+        order = 4
+        fc = 150
+        rs = 3
+        self.b_l, self.a_l = ss.iirfilter(order, fc, rs=rs, btype='lowpass', ftype='butter', output='ba', fs=sampling_rate)
+        self.zi_l = ss.lfilter_zi(self.b_l, self.a_l)
+        # notch
+        self.b_n, self.a_n = ss.iirnotch(50, Q=50/5, fs=sampling_rate)
+        self.zi_n = ss.lfilter_zi(self.b_n, self.a_n)
+
     def add_data(self, new_data):
         with self.data_lock:
-            self.data_buffer.extend(new_data)
+            filtered_data = self.filter_data(new_data)
+            self.data_buffer.extend(filtered_data)
             for _ in range(len(new_data)):
                 self.current_time += 1 / self.sampling_rate
                 self.time_buffer.append(self.current_time)
@@ -64,7 +85,13 @@ class HRVProcessor:
     def get_data(self):
         with self.data_lock:
             return np.array(self.data_buffer), np.array(self.time_buffer)
-
+    
+    def filter_data(self, new_data):
+        filtered_data, self.zi_h = ss.lfilter(self.b_h, self.a_h, new_data, zi=self.zi_h)
+        filtered_data, self.zi_l = ss.lfilter(self.b_l, self.a_l, filtered_data, zi=self.zi_l)
+        filtered_data, self.zi_n = ss.lfilter(self.b_n, self.a_n, filtered_data, zi=self.zi_n)
+        return filtered_data
+    
     def update_peaks_thread(self):
         while self.running:
             self.update_peaks()
@@ -79,7 +106,7 @@ class HRVProcessor:
             return
         
         if self.last_peak_index >= 0:
-            valid_mask = time_buffer > self.last_peak_index + 0.1
+            valid_mask = time_buffer > self.last_peak_index + 0.2
             data = data[valid_mask]
             time_buffer = time_buffer[valid_mask]
 
@@ -88,7 +115,8 @@ class HRVProcessor:
         
         peaks, properties = find_peaks(data, 
                                        prominence=self.find_peaks_setting['prominence'], 
-                                       width=self.find_peaks_setting['width'])
+                                       width=self.find_peaks_setting['width'],
+                                       height=self.find_peaks_setting['height'])
         
         if peaks.size == 0:
             return 
@@ -104,7 +132,6 @@ class HRVProcessor:
             new_rr_intervals = np.diff(new_peaks)
             
             if new_rr_intervals.size > 0:
-                self.calculate_bpm(new_rr_intervals)
                 self.rr_intervals.extend(new_rr_intervals)
 
             self.peaks_time.extend(peaks)
@@ -127,7 +154,7 @@ class HRVProcessor:
             return
         bpm = 60.0 / np.array(new_rr_intervals)
         with self.bpm_lock:
-            self.bpm_list.extend(bpm)
+            self.bpm_list.extend([np.mean(bpm)])
 
     def get_bpm(self):
         with self.bpm_lock:
@@ -150,7 +177,7 @@ class HRVProcessor:
     def calculate_hrv_thread(self):
         while self.running:
             self.calculate_hrv()
-            time.sleep(5)
+            time.sleep(1)
 
     def calculate_hrv(self):
         with self.peaks_lock:
@@ -179,35 +206,34 @@ class HRVProcessor:
         with self.hrv_lock: 
             return np.array(self.power)
     
-
     def calculate_coherence_thread(self):
         while self.running:
             self.calculate_coherence()
             time.sleep(5)
 
     def calculate_coherence(self):
-        with self.coh_lock:
+        with self.hrv_lock:
             if self.frequencies is None:
                 return
-            F = self.get_frequencies()
-            P = self.get_power()
+            F = np.array(self.frequencies)
+            P = np.array(self.power)
 
-            mask1 = (F > 0.04) & (F < 0.26)
-            F1 = F[mask1]
-            P1 = P[mask1]
-            highest_peak_index = np.argmax(P1)
-            highest_peak_frame = [P1[highest_peak_index] - 0.015, P1[highest_peak_index] + 0.015]
-            highest_peak_arr = (P1 > highest_peak_frame[0]) & (P1 < highest_peak_frame[1])
-            peak_power = integrate.simps(P1[highest_peak_arr], F1[highest_peak_arr])
+        mask1 = (F > 0.04) & (F < 0.26)
+        F1 = F[mask1]
+        P1 = P[mask1]
+        highest_peak_index = np.argmax(P1)
+        highest_peak_frame = [P1[highest_peak_index] - 0.015, P1[highest_peak_index] + 0.015]
+        highest_peak_arr = (P1 > highest_peak_frame[0]) & (P1 < highest_peak_frame[1])
+        peak_power = integrate.simps(P1[highest_peak_arr], F1[highest_peak_arr])
 
-            mask2 = (F > 0.0033) & (F < 0.4)
-            F2 = F[mask2]
-            P2 = P[mask2]
-            total_power = integrate.simps(P2, F2)           
-            coherence_value  = (peak_power/(total_power-peak_power))**2
-            self.coherence = ((1 / (np.sqrt(2 * np.pi))) * np.exp(-(self.x_coherence**2) / 2))
-            self.coherence /= np.max(self.coherence)
-            self.coherence *= coherence_value
+        mask2 = (F > 0.0033) & (F < 0.4)
+        F2 = F[mask2]
+        P2 = P[mask2]
+        total_power = integrate.simps(P2, F2)           
+        coherence_value  = (peak_power/total_power)**2
+        self.coherence = ((1 / (np.sqrt(2 * np.pi))) * np.exp(-(self.x_coherence**2) / 2))
+        self.coherence /= np.max(self.coherence)
+        self.coherence *= coherence_value
 
     def get_coherence(self):
         with self.coh_lock:

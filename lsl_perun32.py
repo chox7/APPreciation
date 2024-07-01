@@ -78,7 +78,9 @@ def initialize_filters(fs=500):
 
 
 def filter_chunk(sig, filters):
-    for params in filters:
+    for j, params in enumerate(filters):
+        if j:
+            sig = y
         b, a = params
         zi = ss.lfilter_zi(b, a)
         y = np.zeros(np.shape(sig))

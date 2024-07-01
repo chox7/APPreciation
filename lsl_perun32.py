@@ -60,20 +60,20 @@ def simulate_aquisition(path, processing_chunk_size):
 
 def initialize_filters(fs=500):
     # HP
-    order = 9
+    order = 4
     fc = 0.67
     rp = 0.5
     rs = 3
     hp = ss.iirfilter(order, fc, rp, rs, btype='highpass', ftype='butter', output='ba', fs=fs)
     # LP
-    order = 9
+    order = 4
     fc = 150
     rs = 3
     lp = ss.iirfilter(order, fc, rs=rs, btype='lowpass', ftype='butter', output='ba', fs=fs)
     # notch
     notch_50 = ss.iirnotch(50, Q=50/5, fs=fs)
-    notch_100 = ss.iirnotch(100, Q=50/5, fs=fs)
-    fil = [hp, lp, notch_50, notch_100]
+    #notch_100 = ss.iirnotch(100, Q=50/5, fs=fs)
+    fil = [hp, lp, notch_50]
     return fil
 
 

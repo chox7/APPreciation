@@ -76,7 +76,7 @@ def run_dash_app(processor):
             'data': [ekg_trace],
             'layout': go.Layout(
                 title=f'Live EKG Data',
-                #shapes=shapes,
+                shapes=shapes,
                 plot_bgcolor='white',  # Białe tło wykresu
                 paper_bgcolor='white',  # Białe tło papieru
                 xaxis=dict(

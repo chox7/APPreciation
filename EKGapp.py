@@ -5,7 +5,6 @@ import plotly.graph_objs as go
 from breath import creating_ramp
 import numpy as np
 import lsl_perun32 as lsl
-import time
 
 
 def add_data_continuously(inlet, samps_per_chunk, HR, filts):
@@ -24,11 +23,11 @@ def add_data_continuously(inlet, samps_per_chunk, HR, filts):
         except StopIteration:
             break    
 
-def run_dash_app_thread(HR):
-    app = run_dash_app(HR)
-    app.run_server(debug=True, port=8052, use_reloader=False)
+def run_dash_app_thread(signal_processor, peaks_detector, hrv_analyzer):
+    app = run_dash_app(signal_processor, peaks_detector, hrv_analyzer)
+    app.run_server(debug=True, port=8051, use_reloader=False)
 
-def run_dash_app(processor):
+def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
     app = dash.Dash(__name__)
     app.layout = html.Div([
         dcc.Graph(id='live-graph-ekg', style={'width': '25%', 'display': 'inline-block'}),
@@ -48,8 +47,7 @@ def run_dash_app(processor):
         [Input('interval-component', 'n_intervals')]
     )
     def update_EKG_plot(n):
-        t1 = time.time()
-        data_buffer, time_buffer = processor.get_data()
+        data_buffer, time_buffer = signal_processor.get_data()
 
         ekg_trace = go.Scatter(
             x=time_buffer,
@@ -58,20 +56,18 @@ def run_dash_app(processor):
             name=f'EKG Signal',
         )
         
-        peaks, prominences = processor.get_peaks()
+        peaks, prominences = peaks_detector.get_peaks()
         shapes = []
         for peak, prominence in zip(peaks, prominences):
-            shapes.append(
-                dict(
-                    type="line",
-                    x0=peak, y0=-200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)] - prominence,
-                    x1=peak, y1=200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)],
-                    line=dict(color="orange", width=2)
-                )
-            )
+           shapes.append(
+               dict(
+                   type="line",
+                   x0=peak, y0=-200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)] - prominence,
+                   x1=peak, y1=200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)],
+                   line=dict(color="orange", width=2)
+               )
+           )
         
-        t2 = time.time()
-        #print("EKG plot time:", t2-t1)
         return {
             'data': [ekg_trace],
             'layout': go.Layout(
@@ -95,7 +91,7 @@ def run_dash_app(processor):
     @app.callback(Output('live-graph-hr', 'figure'),
               Input('interval-component', 'n_intervals'))
     def update_HR_plot(n):
-        bpm = processor.get_bpm()
+        bpm = peaks_detector.get_bpm()
         hr_trace = go.Scatter(
             y=bpm,
             mode='lines',
@@ -115,7 +111,7 @@ def run_dash_app(processor):
                 yaxis=dict(
                     gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
                     linecolor='black',  # Linia osi Y w kolorze czarnym
-                    range=[20,300]  # Zakres tętna w BPM (dostosuj do potrzeb)
+                    range=[20,200]  # Zakres tętna w BPM (dostosuj do potrzeb)
                 )
             )
         }
@@ -124,10 +120,13 @@ def run_dash_app(processor):
     @app.callback(Output('live-graph-hrv', 'figure'),
               Input('interval-component', 'n_intervals'))
     def update_HRV_plot(n):
-        F = processor.get_frequencies()
-        F = F[F<0.7]
-        P = processor.get_power()
-        P = P[:len(F)]
+        F = hrv_analyzer.get_frequencies()
+        P = hrv_analyzer.get_power()
+
+        if np.array_equal(F, np.array(None)) or np.array_equal(P, np.array(None)):
+            F = np.zeros(100)
+            P = np.linspace(0,1,100)
+        
         hrv_trace = go.Scatter(
             x=F,
             y=P,
@@ -157,7 +156,7 @@ def run_dash_app(processor):
     @app.callback(Output('live-graph-coherence', 'figure'),
               Input('interval-component', 'n_intervals'))
     def update_coherence_plot(n):
-        x, coh = processor.get_coherence()
+        x, coh = hrv_analyzer.get_coherence()
         coherence_trace = go.Scatter(
             x=x,
             y=coh,

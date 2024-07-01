@@ -10,12 +10,12 @@ def main():
     #chosen_channels = [23, 24, 25, 26, 27, 28, 29]
     #data = lsl.simulate_aquisition(path, processing_chunk_size)
 
-    data = ts.test_signal()
+    inlet = lsl.start_stream('stream_1', 128)
     Fs = 2048
     filts = lsl.initialize_filters(Fs)
     HR = ekgp.HRVProcessor(sampling_rate=Fs, window_size=1)
 
-    data_thread = threading.Thread(target=ekgapp.add_data_continuously, args=(HR, data, filts))
+    data_thread = threading.Thread(target=ekgapp.add_data_continuously, args=(inlet, 128, HR, filts))
     data_thread.setDaemon(True)
     data_thread.start()
 

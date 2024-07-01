@@ -1,78 +1,68 @@
-import numpy as np
 from collections import deque
-from scipy.signal import find_peaks
-from scipy import interpolate
-from scipy.signal import windows
 import scipy.signal as ss
-from scipy import integrate
+from scipy import interpolate, integrate
 import threading
+import numpy as np
 import time
 
-class HRVProcessor:
-    def __init__(self, sampling_rate=500, window_size=5, find_peaks_setting=None):
-        if find_peaks_setting is None:
-            self.find_peaks_setting = {
-                'prominence': 1000,
-                'width': [10, 100],
-                'height': 500,  
-                'distance': 200 
-            }
-        else:
-            self.find_peaks_setting = find_peaks_setting
 
+class SignalProcessor:
+    def __init__(self, sampling_rate=500, buffor_size_seconds=5, hp_params=None, lp_params=None, notch_params=None):
         self.sampling_rate = sampling_rate
-        self.window_size = window_size
-        self.buffor_size = self.sampling_rate * self.window_size
+        self.buffor_size = self.sampling_rate * buffor_size_seconds
         self.data_buffer = deque(maxlen=self.buffor_size)
         self.time_buffer = deque(maxlen=self.buffor_size)
         self.current_time = 0
-        self.last_peak_index = -1 # index of the last peak in the data_buffer in seconds
 
-        self.bmp_size = 100
-        self.rr_intervals = deque(maxlen=self.bmp_size-1) 
-        self.peaks_time = deque(maxlen=self.bmp_size)
-        self.peaks_prominence = deque(maxlen=self.bmp_size)
-        self.bpm_list = deque(maxlen=self.bmp_size)
-        self.frequencies = None
-        self.power = None
-        self.coherence = deque(maxlen=1000)
-        self.x_coherence = np.linspace(-4, 4, 1000)
+        # Set filters params
+        if hp_params is None:
+            self.hp_params = {'order': 3, 'fc': 0.67, 'rp': 0.5, 'rs': 3}
+        if lp_params is None:    
+            self.lp_params = {'order': 4, 'fc': 150, 'rs': 3}
+        if notch_params is None:    
+            self.notch_params = {'f0': 50, 'Q': 10}
 
-        # Synchronization
+        # Initialize filters
+        self.update_filters()
+
+        # Synchronization and threading
         self.data_lock = threading.Lock()
-        self.peaks_lock = threading.Lock()
-        self.bpm_lock = threading.Lock()
-        self.hrv_lock = threading.Lock()
-        self.coh_lock = threading.Lock()
-
-        # Threads
         self.running = True
-        self.peaks_thread = threading.Thread(target=self.update_peaks_thread)
-        self.bpm_thread = threading.Thread(target=self.calculate_bpm_thread)
-        self.hrv_thread = threading.Thread(target=self.calculate_hrv_thread)
-        self.coh_thread = threading.Thread(target=self.calculate_coherence_thread)
 
-        self.peaks_thread.start()
-        self.bpm_thread.start()
-        self.hrv_thread.start()
-        self.coh_thread.start()
-
-        # HP
-        order = 3
-        fc = 0.67
-        rp = 0.5
-        rs = 3
-        self.b_h, self.a_h = ss.iirfilter(order, fc, rp, rs, btype='highpass', ftype='butter', output='ba', fs=sampling_rate)
+    def update_filters(self):
+        # High-pass filter
+        self.b_h, self.a_h = ss.iirfilter(self.hp_params['order'], self.hp_params['fc'],
+                                          self.hp_params['rp'], self.hp_params['rs'],
+                                          btype='highpass', ftype='butter', output='ba', fs=self.sampling_rate)
         self.zi_h = ss.lfilter_zi(self.b_h, self.a_h)
-        # LP
-        order = 4
-        fc = 150
-        rs = 3
-        self.b_l, self.a_l = ss.iirfilter(order, fc, rs=rs, btype='lowpass', ftype='butter', output='ba', fs=sampling_rate)
+
+        # Low-pass filter
+        self.b_l, self.a_l = ss.iirfilter(self.lp_params['order'], self.lp_params['fc'],
+                                          rs=self.lp_params['rs'], btype='lowpass',
+                                          ftype='butter', output='ba', fs=self.sampling_rate)
         self.zi_l = ss.lfilter_zi(self.b_l, self.a_l)
-        # notch
-        self.b_n, self.a_n = ss.iirnotch(50, Q=50/5, fs=sampling_rate)
+
+        # Notch filter
+        self.b_n, self.a_n = ss.iirnotch(self.notch_params['f0'], Q=self.notch_params['Q'], fs=self.sampling_rate)
         self.zi_n = ss.lfilter_zi(self.b_n, self.a_n)
+
+    def set_highpass_params(self, order, fc, rp, rs):
+        self.hp_params['order'] = order
+        self.hp_params['fc'] = fc
+        self.hp_params['rp'] = rp
+        self.hp_params['rs'] = rs
+        self.update_filters()
+
+    def set_lowpass_params(self, order, fc, rs):
+        self.lp_params['order'] = order
+        self.lp_params['fc'] = fc
+        self.lp_params['rs'] = rs
+        self.update_filters()
+
+    def set_notch_params(self, f0, Q):
+        self.notch_params['f0'] = f0
+        self.notch_params['Q'] = Q
+        self.update_filters()
 
     def add_data(self, new_data):
         with self.data_lock:
@@ -81,7 +71,7 @@ class HRVProcessor:
             for _ in range(len(new_data)):
                 self.current_time += 1 / self.sampling_rate
                 self.time_buffer.append(self.current_time)
-        
+
     def get_data(self):
         with self.data_lock:
             return np.array(self.data_buffer), np.array(self.time_buffer)
@@ -92,15 +82,45 @@ class HRVProcessor:
         filtered_data, self.zi_n = ss.lfilter(self.b_n, self.a_n, filtered_data, zi=self.zi_n)
         return filtered_data
     
+
+class PeaksDetector:
+    def __init__(self, signal_processor, find_peaks_setting=None):
+        self.signal_processor = signal_processor
+        if find_peaks_setting is None:
+            self.find_peaks_setting = {
+                'prominence': 1000,
+                'width': [10, 100],
+                'height': 500,
+                'distance': 200
+            }
+        else:
+            self.find_peaks_setting = find_peaks_setting
+
+        self.last_peak_index = -1 # index of the last peak in the data_buffer in seconds
+        self.peak_buffor_size = 100
+        self.rr_intervals = deque(maxlen=self.peak_buffor_size-1) 
+        self.peaks_time = deque(maxlen=self.peak_buffor_size)
+        self.peaks_prominence = deque(maxlen=self.peak_buffor_size)
+        self.bpm_list = deque(maxlen=self.peak_buffor_size)
+
+        # Synchronization and threading
+        self.peaks_lock = threading.Lock()
+        self.bpm_lock = threading.Lock()
+        self.peaks_thread = threading.Thread(target=self.update_peaks_thread)
+        self.bpm_thread = threading.Thread(target=self.calculate_bpm_thread)
+        self.running = True
+        self.peaks_thread.start()
+        self.bpm_thread.start()
+
     def update_peaks_thread(self):
         while self.running:
             self.update_peaks()
             time.sleep(1)   
 
     def update_peaks(self):
-        with self.data_lock:
-            data = np.array(self.data_buffer)
-            time_buffer = np.array(self.time_buffer)
+        with self.signal_processor.data_lock:
+            data = np.array(self.signal_processor.data_buffer)
+            time_buffer = np.array(self.signal_processor.time_buffer)
 
         if data.size == 0:
             return
@@ -113,7 +133,7 @@ class HRVProcessor:
         if data.size == 0:
             return
         
-        peaks, properties = find_peaks(data, 
+        peaks, properties = ss.find_peaks(data, 
                                        prominence=self.find_peaks_setting['prominence'], 
                                        width=self.find_peaks_setting['width'],
                                        height=self.find_peaks_setting['height'])
@@ -140,7 +160,7 @@ class HRVProcessor:
 
     def get_peaks(self):   
         with self.peaks_lock: 
-            return self.peaks_time, self.peaks_prominence
+            return np.array(self.peaks_time), np.array(self.peaks_prominence)
     
     def calculate_bpm_thread(self):
         while self.running:
@@ -159,7 +179,24 @@ class HRVProcessor:
     def get_bpm(self):
         with self.bpm_lock:
             return np.array(self.bpm_list)
-    
+
+class HRVAnalyzer:
+    def __init__(self, peaks_detector):
+        self.peaks_detector = peaks_detector
+        self.frequencies = None
+        self.power = None
+        self.coherence = deque(maxlen=1000)
+        self.x_coherence = np.linspace(-4, 4, 1000)
+
+        # Synchronization and threading
+        self.hrv_lock = threading.Lock()
+        self.coh_lock = threading.Lock()
+        self.running = True
+        self.hrv_thread = threading.Thread(target=self.calculate_hrv_thread)
+        self.coh_thread = threading.Thread(target=self.calculate_coherence_thread)
+        self.hrv_thread.start()
+        self.coh_thread.start()
+
     def periodogram(self, s, okno , Fs):
         okno = okno / np.linalg.norm(okno)
         s = s * okno
@@ -180,19 +217,21 @@ class HRVProcessor:
             time.sleep(1)
 
     def calculate_hrv(self):
-        with self.peaks_lock:
-            if len(self.rr_intervals) < 10:
+        with self.peaks_detector.peaks_lock:
+            if len(self.peaks_detector.rr_intervals) < 10:
                 return
-            peaks = np.array(self.peaks_time)
-            RR = np.array(self.rr_intervals) * self.sampling_rate
+            peaks = np.array(self.peaks_detector.peaks_time)
+            RR = np.array(self.peaks_detector.rr_intervals) * self.peaks_detector.signal_processor.sampling_rate
             RR_new = interpolate.interp1d(peaks[:-1], 1/RR, kind='linear')
 
         Fs_2 = 1
-        t2 = np.arange(self.peaks_time[0], self.peaks_time[-2], 1/Fs_2)
+        t2 = np.arange(peaks[0], self.peaks[-2], 1/Fs_2)
         p = np.polyfit(t2, RR_new(t2), deg=2)
+        t2 = np.arange(peaks[0], peaks[-2], 1/Fs_2)
+        p = np.polyfit(t2, RR_new(t2), deg=3)
         f = np.polyval(p, t2)
         sig = RR_new(t2) - f
-        okno = windows.hann(len(t2))
+        okno = ss.windows.hann(len(t2))
         F, P = self.periodogram(sig, okno, Fs_2)   
         with self.hrv_lock:
             self.frequencies = F
@@ -209,7 +248,7 @@ class HRVProcessor:
     def calculate_coherence_thread(self):
         while self.running:
             self.calculate_coherence()
-            time.sleep(5)
+            time.sleep(1)
 
     def calculate_coherence(self):
         with self.hrv_lock:
@@ -231,17 +270,11 @@ class HRVProcessor:
         P2 = P[mask2]
         total_power = integrate.simps(P2, F2)           
         coherence_value  = (peak_power/total_power)**2
-        self.coherence = ((1 / (np.sqrt(2 * np.pi))) * np.exp(-(self.x_coherence**2) / 2))
-        self.coherence /= np.max(self.coherence)
-        self.coherence *= coherence_value
+        with self.coh_lock:
+            self.coherence = ((1 / (np.sqrt(2 * np.pi))) * np.exp(-(self.x_coherence**2) / 2))
+            self.coherence /= np.max(self.coherence)
+            self.coherence *= coherence_value
 
     def get_coherence(self):
         with self.coh_lock:
             return (np.array(self.x_coherence), np.array(self.coherence))
-
-    def stop(self):
-        self.running = False
-        self.peaks_thread.join()
-        self.bpm_thread.join()
-        self.hrv_thread.join()
-        self.coh_thread.join()

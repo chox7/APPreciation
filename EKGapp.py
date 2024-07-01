@@ -8,7 +8,7 @@ import lsl_perun32 as lsl
 import time
 
 
-def add_data_continuously(HR, data, filts):
+def add_data_continuously(inlet, samps_per_chunk, HR, filts)::
     '''
     Chunk filtered posiada np.array o kształcie: (processing_chunk_size, liczba_kanałów=32)
     Jest już przefiltrowany

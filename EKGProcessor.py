@@ -5,7 +5,6 @@ import threading
 import numpy as np
 import time
 
-
 class SignalProcessor:
     def __init__(self, sampling_rate=500, buffor_size_seconds=5, hp_params=None, lp_params=None, notch_params=None):
         self.sampling_rate = sampling_rate
@@ -18,7 +17,7 @@ class SignalProcessor:
         if hp_params is None:
             self.hp_params = {'order': 3, 'fc': 0.67, 'rp': 0.5, 'rs': 3}
         if lp_params is None:    
-            self.lp_params = {'order': 4, 'fc': 150, 'rs': 3}
+            self.lp_params = {'order': 4, 'fc': 150, 'rp':None, 'rs': 3}
         if notch_params is None:    
             self.notch_params = {'f0': 50, 'Q': 10}
 
@@ -38,8 +37,8 @@ class SignalProcessor:
 
         # Low-pass filter
         self.b_l, self.a_l = ss.iirfilter(self.lp_params['order'], self.lp_params['fc'],
-                                          rs=self.lp_params['rs'], btype='lowpass',
-                                          ftype='butter', output='ba', fs=self.sampling_rate)
+                                          self.hp_params['rp'], rs=self.lp_params['rs'],
+                                          btype='lowpass', ftype='butter', output='ba', fs=self.sampling_rate)
         self.zi_l = ss.lfilter_zi(self.b_l, self.a_l)
 
         # Notch filter

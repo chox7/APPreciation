@@ -162,7 +162,7 @@ class HRVProcessor:
 
         Fs_2 = 1
         t2 = np.arange(self.peaks_time[0], self.peaks_time[-2], 1/Fs_2)
-        p = np.polyfit(t2, RR_new(t2), deg=3)
+        p = np.polyfit(t2, RR_new(t2), deg=2)
         f = np.polyval(p, t2)
         sig = RR_new(t2) - f
         okno = windows.hann(len(t2))

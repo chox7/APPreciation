@@ -11,7 +11,7 @@ def main():
     #data = lsl.simulate_aquisition(path, processing_chunk_size)
 
     inlet = lsl.start_stream('stream_1', 16)
-    Fs = 2048
+    Fs = 500
     filts = lsl.initialize_filters(Fs)
     HR = ekgp.HRVProcessor(sampling_rate=Fs, window_size=1)
 

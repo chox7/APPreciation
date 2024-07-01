@@ -71,8 +71,9 @@ def initialize_filters(fs=500):
     rs = 3
     lp = ss.iirfilter(order, fc, rs=rs, btype='lowpass', ftype='butter', output='ba', fs=fs)
     # notch
-    notch = ss.iirnotch(50, Q=50/5, fs=fs)
-    fil = [hp, lp, notch]
+    notch_50 = ss.iirnotch(50, Q=50/5, fs=fs)
+    notch_100 = ss.iirnotch(100, Q=50/5, fs=fs)
+    fil = [hp, lp, notch_50, notch_100]
     return fil
 
 

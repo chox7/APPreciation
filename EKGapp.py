@@ -4,8 +4,6 @@ from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 from breath import creating_ramp
 import numpy as np
-import lsl_perun32 as lsl
-
 
 def add_data_continuously(inlet, samps_per_chunk, signal_processor):
     while True:

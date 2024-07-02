@@ -26,7 +26,7 @@ class SignalProcessor:
 
         # Synchronization and threading
         self.data_lock = threading.Lock()
-        self.running = True
+        self.running = False
 
     def update_filters(self):
         # High-pass filter
@@ -52,9 +52,10 @@ class SignalProcessor:
         self.hp_params['rs'] = rs
         self.update_filters()
 
-    def set_lowpass_params(self, order, fc, rs):
+    def set_lowpass_params(self, order, fc, rp, rs):
         self.lp_params['order'] = order
         self.lp_params['fc'] = fc
+        self.hp_params['rp'] = rp
         self.lp_params['rs'] = rs
         self.update_filters()
 
@@ -64,6 +65,8 @@ class SignalProcessor:
         self.update_filters()
 
     def add_data(self, new_data):
+        if not self.running:
+            return
         with self.data_lock:
             filtered_data = self.filter_data(new_data)
             self.data_buffer.extend(filtered_data)
@@ -81,6 +84,11 @@ class SignalProcessor:
         filtered_data, self.zi_n = ss.lfilter(self.b_n, self.a_n, filtered_data, zi=self.zi_n)
         return filtered_data
     
+    def start(self):
+        self.running = True
+
+    def stop(self):
+        self.running = False
 
 class PeaksDetector:
     def __init__(self, signal_processor, find_peaks_setting=None):
@@ -107,14 +115,14 @@ class PeaksDetector:
         self.bpm_lock = threading.Lock()
         self.peaks_thread = threading.Thread(target=self.update_peaks_thread)
         self.bpm_thread = threading.Thread(target=self.calculate_bpm_thread)
-        self.running = True
+        self.running = False
         self.peaks_thread.start()
         self.bpm_thread.start()
 
     def update_peaks_thread(self):
         while self.running:
             self.update_peaks()
-            time.sleep(1)   
+        time.sleep(1)   
 
     def update_peaks(self):
         with self.signal_processor.data_lock:
@@ -179,6 +187,12 @@ class PeaksDetector:
         with self.bpm_lock:
             return np.array(self.bpm_list)
 
+    def start(self):
+        self.running = True
+
+    def stop(self):
+        self.running = False
+
 class HRVAnalyzer:
     def __init__(self, peaks_detector):
         self.peaks_detector = peaks_detector
@@ -213,7 +227,7 @@ class HRVAnalyzer:
     def calculate_hrv_thread(self):
         while self.running:
             self.calculate_hrv()
-            time.sleep(1)
+        time.sleep(1)
 
     def calculate_hrv(self):
         with self.peaks_detector.peaks_lock:
@@ -247,7 +261,7 @@ class HRVAnalyzer:
     def calculate_coherence_thread(self):
         while self.running:
             self.calculate_coherence()
-            time.sleep(1)
+        time.sleep(1)
 
     def calculate_coherence(self):
         with self.hrv_lock:
@@ -277,3 +291,9 @@ class HRVAnalyzer:
     def get_coherence(self):
         with self.coh_lock:
             return (np.array(self.x_coherence), np.array(self.coherence))
+    
+    def start(self):
+        self.running = True
+
+    def stop(self):
+        self.running = False

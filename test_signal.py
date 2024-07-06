@@ -1,22 +1,26 @@
 import numpy as np
 import time
 
-def signal_generator(s):
-    for i in range(0, len(s[:]), 16):
-        time.sleep(0.02)
-        # Zakładam, że:
-        # kanał 2 posiada sygnał EKG z lewej nogi
-        # kanał 1 posiada sygnał EKG z prawej kończyny górnej (nadgarstek lub ramię)
-        # EINTHOVEN II = VF - VR
-        #eint_2 = -1 * new_data[:,23]
-        #eint_2 = s[:, 1] - s[:, 0]
-        eint_2 = s
-        yield eint_2[i:i+16]
+def signal_generator(s, channel, channel_base, fs, chunk_size):
+    try:
+        for i in range(0, len(s[:,0]), chunk_size):
+            time.sleep(chunk_size / fs)
 
-def test_signal():
-    n_ch = 1
-    s_path = 'majatest.obci.raw'
-    s = np.fromfile(s_path, dtype='<f')
+            if channel_base == -1:
+                if channel == 0:
+                    syg = s
+                else:
+                    syg = s[:, channel]
+            else:
+                syg = s[:, channel] - s[:, channel_base]
+
+            yield syg[i:i+chunk_size]
+    except StopIteration:
+        print("End of signal reached")
+
+def test_signal(s_path, n_ch=1, dtype='<f', channel=None, channel_base=None, fs=500, chunk_size=16):
+    s = np.fromfile(s_path, dtype=dtype)
     s = s * 0.0715
-    #s = np.reshape(s, (len(s)//n_ch, n_ch))
-    return signal_generator(s)
+    if n_ch != 1:
+        s = np.reshape(s, (len(s)//n_ch, n_ch))
+    return signal_generator(s, channel, channel_base, fs, chunk_size)

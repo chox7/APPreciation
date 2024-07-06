@@ -5,15 +5,6 @@ import plotly.graph_objs as go
 from breath import creating_ramp
 import numpy as np
 
-def add_data_continuously(inlet, samps_per_chunk, signal_processor):
-    while True:
-        try:
-            sample, timestamp = inlet.pull_chunk(timeout=1.0, max_samples=samps_per_chunk)
-            piece = np.array(sample)[:, 23]
-            signal_processor.add_data(piece)
-        except StopIteration:
-            break    
-
 def run_dash_app_thread(signal_processor, peaks_detector, hrv_analyzer):
     app = run_dash_app(signal_processor, peaks_detector, hrv_analyzer)
     app.run_server(debug=True, port=8051, use_reloader=False)
@@ -23,6 +14,9 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
     app.layout = html.Div([
         dcc.Tabs([
             dcc.Tab(label='Wykresy na żywo', children=[
+                html.Button('Start', id='start-button', n_clicks=0),
+                html.Button('Stop', id='stop-button', n_clicks=0),
+                dcc.Store(id='running-state', data=False),  # Hidden div to store the running state
                 html.Div([
                     dcc.Graph(id='live-graph-ekg', style={'width': '25%', 'display': 'inline-block'}),
                     dcc.Graph(id='live-graph-hr', style={'width': '25%', 'display': 'inline-block'}),
@@ -33,10 +27,7 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
                         id='interval-component',
                         interval=50,  # Aktualizacja co 50 ms
                         n_intervals=0
-                    ),
-                    html.Button('Start', id='start-button', n_clicks=0),
-                    html.Button('Stop', id='stop-button', n_clicks=0),
-                    dcc.Store(id='running-state', data=False)  # Hidden div to store the running state
+                    )
                 ])
             ]),
             dcc.Tab(label='Ustawienia sygnałów', children=[
@@ -145,12 +136,19 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
         [State('running-state', 'data')]
     )
     def update_running_state(start_clicks, stop_clicks, running_state):
-        if start_clicks > stop_clicks:
+        ctx = dash.callback_context
+
+        if not ctx.triggered:
+            return running_state
+
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+        if button_id == 'start-button':
             signal_processor.start()
             peaks_detector.start()
             hrv_analyzer.start()
             return True
-        else:
+        elif button_id == 'stop-button':
             signal_processor.stop()
             peaks_detector.stop()
             hrv_analyzer.stop()
@@ -180,9 +178,9 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
            shapes.append(
                dict(
                    type="line",
-                   x0=peak, y0=-200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)] - prominence,
-                   x1=peak, y1=200,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)],
-                   line=dict(color="orange", width=2)
+                   x0=peak, y0=0,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)] - prominence,
+                   x1=peak, y1=2000,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)],
+                   line=dict(color="red", width=3)
                )
            )
         
@@ -294,6 +292,9 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
             return dash.no_update
         
         x, coh = hrv_analyzer.get_coherence()
+
+        if np.array_equal(coh, np.array(None)) :
+            coh = np.zeros(len(x))
 
         coherence_trace = go.Scatter(
             x=x,

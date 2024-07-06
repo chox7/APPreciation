@@ -172,23 +172,23 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
             name=f'EKG Signal',
         )
         
-        peaks, prominences = peaks_detector.get_peaks()
-        shapes = []
-        for peak, prominence in zip(peaks, prominences):
-           shapes.append(
-               dict(
-                   type="line",
-                   x0=peak, y0=0,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)] - prominence,
-                   x1=peak, y1=2000,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)],
-                   line=dict(color="red", width=3)
-               )
-           )
+        # peaks, prominences = peaks_detector.get_peaks()
+        # shapes = []
+        # for peak, prominence in zip(peaks, prominences):
+        #    shapes.append(
+        #        dict(
+        #            type="line",
+        #            x0=peak, y0=0,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)] - prominence,
+        #            x1=peak, y1=2000,#data_buffer[int((peak - time_buffer[0])*processor.sampling_rate)],
+        #            line=dict(color="red", width=3)
+        #        )
+        #    )
         
         return {
             'data': [ekg_trace],
             'layout': go.Layout(
                 title=f'Live EKG Data',
-                shapes=shapes,
+                #shapes=shapes,
                 plot_bgcolor='white',  # Białe tło wykresu
                 paper_bgcolor='white',  # Białe tło papieru
                 xaxis=dict(

@@ -1,18 +1,10 @@
 from pylsl import StreamInlet, resolve_stream
-import time
-import h5py
-import numpy as np
-import scipy.signal as ss
 
-# NIE RUSZAĆ!
-
-
-def start_stream(stream_name, samps_per_chunk):
+def start_stream(stream_name):
     '''
     Rozpoczęcie streamu z Peruna 32.
     :param save_path: Ścieżka zapisu danych
     :param stream_name: Nazwa streamu, taka sama jaką użyto w svarog_streamer
-    :param samps_per_chunk: Liczba próbek na odebrany chunk.
     :return:
     '''
     # znajdujemy streamy
@@ -31,60 +23,3 @@ def start_stream(stream_name, samps_per_chunk):
     inlet = StreamInlet(selected_stream)
 
     return inlet
-
-
-def simulate_aquisition(path, processing_chunk_size):
-    with h5py.File(path, "r") as fil:
-        processing_chunk = np.zeros((processing_chunk_size, 32))
-        print(np.shape(processing_chunk))
-        last_n = 0
-        raw_chunk_size = 0
-
-        cnt = 0
-        for chunk_id in fil.keys():
-            if raw_chunk_size == 0:
-                raw_chunk_size = len(fil[chunk_id]['samples'][:][:, 1])
-                print(fil[chunk_id]['timestamp'][1]-fil[chunk_id]['timestamp'][0])
-                # print(raw_chunk_size)
-            start, stop = last_n, last_n+raw_chunk_size
-            if start < processing_chunk_size-1 and stop <= processing_chunk_size:
-                processing_chunk[start:stop, :] = 0.0715 * fil[chunk_id]['samples'][:][:, :]
-                last_n = stop
-            else:
-                time.sleep(0.5)
-                yield processing_chunk
-                processing_chunk = np.empty((processing_chunk_size, 32), dtype=float)
-                last_n = 0
-                cnt += 1
-
-
-def initialize_filters(fs=500):
-    # HP
-    order = 4
-    fc = 0.67
-    rp = 0.5
-    rs = 3
-    hp = ss.iirfilter(order, fc, rp, rs, btype='highpass', ftype='butter', output='ba', fs=fs)
-    # LP
-    order = 4
-    fc = 150
-    rs = 3
-    lp = ss.iirfilter(order, fc, rs=rs, btype='lowpass', ftype='butter', output='ba', fs=fs)
-    # notch
-    notch_50 = ss.iirnotch(50, Q=50/5, fs=fs)
-    #notch_100 = ss.iirnotch(100, Q=50/5, fs=fs)
-    fil = [hp, lp, notch_50]
-    return fil
-
-
-def filter_chunk(sig, filters):
-    for j, params in enumerate(filters):
-        if j:
-            sig = y
-        b, a = params
-        zi = ss.lfilter_zi(b, a)
-        y = np.zeros(np.shape(sig))
-        for i, s in enumerate(sig):
-            y_tmp, zi = ss.lfilter(b, a, [s], zi=zi)
-            y[i] = y_tmp[-1]
-    return y

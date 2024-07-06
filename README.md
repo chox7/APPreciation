@@ -3,9 +3,6 @@ Aplikacja pomagająca wejść w stan koherencji serca dzięki ćwiczeniom oddech
 
 **Koherencja serca** to stan głębokiego spokoju, w którym rytm serca synchronizuje się z oddechem. Tętno lekko przyspiesza podczas wdechu i zwalnia podczas wydechu. Pomóc w osiągnięciu tego stanu może ćwiczenie polegające na wykonywaniu wolnych i spokojnych oddechów. Korzyści z koherencji serca są liczne. Ciało i umysł regenerują się, poprawiają się pamięć i koncentracja, a także odczuwa się więcej pozytywnych emocji takich jak radość i wdzięczność. Dodatkowo obniżają się ciśnienie krwi i poziom kortyzolu, co w efekcie zmniejsza poziom stresu.
 
-## Działanie aplikacji
-Tutaj wstawimy zdjęcia/filmik jak działa aplikacja.
-
 ## Funkcje
 * Ćwiczenie oddechowe, które pomoże zsynchronizować oddech z rytmem serca.
 * Możliwość spersonalizowania długości wdechu i wydechu do indywidualnych potrzeb.
@@ -45,11 +42,40 @@ Tutaj wstawimy zdjęcia/filmik jak działa aplikacja.
     ```PowerShell
     .venv\Scripts\activate
     ```
+## Uruchomienie aplikacji 
+Aby uruchomić aplikację, użyj następujących poleceń w terminalu, dostosowując opcjonalne argumenty w zależności od potrzeb.
+
+Opcjonalne argumenty:
+
+--mode: Tryb uruchomienia aplikacji. Dostępne opcje: online, offline. (Wymagane)
+
+--chunk_size: Rozmiar fragmentu danych do przetwarzania. Domyślna wartość: 16.
+
+--Fs: Częstotliwość próbkowania. Domyślna wartość: 500.
+
+--channel: Numer kanału dla trybu online i offline. Domyślna wartość: 32.
+
+--s_path: Ścieżka do sygnału dla trybu offline. Domyślna wartość: test_perun.raw.
+
+Przykładowe uruchomienia
+Tryb online:
+
+```bash
+python main.py --mode online --chunk_size 16 --Fs 500 --channel 23
+```
+
+Tryb offline:
+
+```bash
+python main.py --mode offline --chunk_size 16 --Fs 500 --n_ch 1 --channel 0 --s_path test_perun.raw
+```
+
 
 ## Użycie aplikacji
-1. Po uruchomieniu aplikacji naciśnij start, aby rozpocząć ćwiczenie oddechowe.
-2. Oddychaj zgodnie ze schematem: gdy piłeczka porusza się w górę weź wdech, gdy porusza się poziomo wstrzymaj oddech, a gdy porusza się w dół zrób wydech.
-3. Jeśli prędkość oddychania Ci nie odpowiada, możesz zmienić ją w ustawieniach.
+1. Po uruchomieniu aplikacji naciśnij start w górnej części aplikacji, aby uruchomić pobieranie sygnału
+2. Następnie naciśnij start przy schemacie oddechowym, aby rozpocząć ćwiczenie oddechowe.
+3. Oddychaj zgodnie ze schematem: gdy piłeczka porusza się w górę weź wdech, gdy porusza się poziomo wstrzymaj oddech, a gdy porusza się w dół zrób wydech.
+4. Jeśli prędkość oddychania Ci nie odpowiada, możesz zmienić ją w ustawieniach.
 
 ## Literatura
 1. Materiały ze strony brain.fuw.edu.pl do Pracowni Sygnałów Bioelektrycznych

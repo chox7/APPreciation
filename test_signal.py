@@ -3,7 +3,7 @@ import time
 
 def signal_generator(s, channel, channel_base, fs, chunk_size):
     try:
-        for i in range(0, len(s[:,0]), chunk_size):
+        for i in range(0, len(s[:]), chunk_size):
             time.sleep(chunk_size / fs)
 
             if channel_base == -1:

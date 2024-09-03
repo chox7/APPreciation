@@ -5,24 +5,31 @@ import argparse
 import test_signal as ts
 
 def run_online(chunk_size, Fs, channel):
+    # Start the LSL stream
     inlet = lsl.start_stream('stream_1')
 
+    # Create the processor, peaks detector and HRV analyzer
     processor = ekgp.SignalProcessor(inlet=inlet, samps_per_chunk=chunk_size, sampling_rate=Fs, buffor_size_seconds=5, mode='online', channel=channel)
     peaks_detector =  ekgp.PeaksDetector(processor)
     hrv_analyzer = ekgp.HRVAnalyzer(peaks_detector)
 
+    # Run the application
     ekgapp.run_dash_app_thread(processor, peaks_detector, hrv_analyzer)
 
 def run_offline(chunk_size, Fs, s_path, n_ch, channel, channel_base):
+    # Generate the test signal
     inlet = ts.test_signal(s_path=s_path, n_ch=n_ch, dtype='<f', channel=channel, channel_base=channel_base, fs=Fs, chunk_size=chunk_size)
 
+    # Create the processor, peaks detector and HRV analyzer
     processor = ekgp.SignalProcessor(inlet=inlet, samps_per_chunk=chunk_size, sampling_rate=Fs, buffor_size_seconds=5, mode='offline')
     peaks_detector = ekgp.PeaksDetector(processor)
     hrv_analyzer = ekgp.HRVAnalyzer(peaks_detector)
 
+    # Run the application
     ekgapp.run_dash_app_thread(processor, peaks_detector, hrv_analyzer)
 
 def main():
+    # Parse the arguments
     parser = argparse.ArgumentParser(description="EKG Processor Application")
 
     parser.add_argument('--mode', choices=['online', 'offline'], required=True, help="Mode to run the application in")
@@ -34,7 +41,8 @@ def main():
     parser.add_argument('--s_path', type=str, default='test_perun.raw', help="Signal path for offline mode")
 
     args = parser.parse_args()
-    
+
+    # Run the application in the selected mode
     if args.mode == 'online':
         run_online(args.chunk_size, args.Fs, args.channel)
     elif args.mode == 'offline':

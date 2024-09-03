@@ -5,10 +5,12 @@ import plotly.graph_objs as go
 from breath import creating_ramp
 import numpy as np
 
+# Function to run the Dash app
 def run_dash_app_thread(signal_processor, peaks_detector, hrv_analyzer):
     app = run_dash_app(signal_processor, peaks_detector, hrv_analyzer)
     app.run_server(debug=True, port=8051, use_reloader=False)
 
+# Function to create the Dash app
 def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
     app = dash.Dash(__name__)
     app.layout = html.Div([
@@ -172,6 +174,8 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
             name=f'EKG Signal',
         )
         
+        # Uncomment to show detected peaks on the plot
+
         # peaks, prominences = peaks_detector.get_peaks()
         # shapes = []
         # for peak, prominence in zip(peaks, prominences):
@@ -188,17 +192,17 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
             'data': [ekg_trace],
             'layout': go.Layout(
                 title=f'Live EKG Data',
-                #shapes=shapes,
-                plot_bgcolor='white',  # Białe tło wykresu
-                paper_bgcolor='white',  # Białe tło papieru
+                #shapes=shapes,     # Uncomment to show detected peaks on the plot
+                plot_bgcolor='white', 
+                paper_bgcolor='white',  
                 xaxis=dict(
-                    gridcolor='white',  # Siatka w kolorze jasnoszarym
-                    linecolor='white',  # Linia osi X w kolorze czarnym
+                    gridcolor='white',  
+                    linecolor='white',  
                     range=[time_buffer[0], time_buffer[-1]]
                 ),
                 yaxis=dict(
-                    gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
-                    linecolor='black',  # Linia osi Y w kolorze czarnym
+                    gridcolor='lightgrey', 
+                    linecolor='black',
                     range=[1.2 * np.min(data_buffer), 1.2 * np.max(data_buffer)]
                 )
             )
@@ -225,16 +229,16 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
             'data': [hr_trace],
             'layout': go.Layout(
                 title='Live Heart Rate',
-                plot_bgcolor='white',  # Białe tło wykresu
-                paper_bgcolor='white',  # Białe tło papieru
+                plot_bgcolor='white',  
+                paper_bgcolor='white',  
                 xaxis=dict(
-                    gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
-                    linecolor='black'  # Linia osi X w kolorze czarnym
+                    gridcolor='lightgrey',  
+                    linecolor='black'  
                 ),
                 yaxis=dict(
-                    gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
-                    linecolor='black',  # Linia osi Y w kolorze czarnym
-                    range=[20,200]  # Zakres tętna w BPM (dostosuj do potrzeb)
+                    gridcolor='lightgrey',  
+                    linecolor='black', 
+                    range=[20,200]
                 )
             )
         }
@@ -267,17 +271,17 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
             'data': [hrv_trace],
             'layout': go.Layout(
                 title='Live Heart Rate Variability',
-                plot_bgcolor='white',  # Białe tło wykresu
-                paper_bgcolor='white',  # Białe tło papieru
+                plot_bgcolor='white',  
+                paper_bgcolor='white', 
                 xaxis=dict(
-                    gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
+                    gridcolor='lightgrey', 
                     linecolor='black',
-                    range = [0,0.55]  # Zakres osi częstotliwości
+                    range = [0,0.55]  # Range of frequencies
                 ),
                 yaxis=dict(
-                    gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
-                    linecolor='black',  # Linia osi Y w kolorze czarnym
-                    #range=[0,300]  # Zakres osi mocy
+                    gridcolor='lightgrey', 
+                    linecolor='black', 
+                    #range=[0,300] 
                 )
             )
         }
@@ -307,18 +311,18 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer):
             'data': [coherence_trace],
             'layout': go.Layout(
                 title='Coherence',
-                plot_bgcolor='white',  # Białe tło wykresu
-                paper_bgcolor='white',  # Białe tło papieru
+                plot_bgcolor='white',
+                paper_bgcolor='white',  
                 xaxis=dict(
-                    gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
+                    gridcolor='lightgrey',  
                     linecolor='lightgray',
-                    range = [-4,4],  # Zakres osi częstotliwości
+                    range = [-4,4],  
                     showticklabels=False
                 ),
                 yaxis=dict(
-                    gridcolor='lightgrey',  # Siatka w kolorze jasnoszarym
-                    linecolor='lightgray',  # Linia osi Y w kolorze czarnym
-                    range=[0,1]  # Zakres osi mocy
+                    gridcolor='lightgrey',  
+                    linecolor='lightgray',  
+                    range=[0,1]  
                 )
             )
         }

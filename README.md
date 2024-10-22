@@ -127,6 +127,7 @@ Aby uruchomić aplikację, użyj następujących poleceń w terminalu, dostosowu
 2. Następnie naciśnij start przy schemacie oddechowym, aby rozpocząć ćwiczenie oddechowe.
 3. Oddychaj zgodnie ze schematem: gdy piłeczka porusza się w górę weź wdech, gdy porusza się poziomo wstrzymaj oddech, a gdy porusza się w dół zrób wydech.
 4. Jeśli prędkość oddychania Ci nie odpowiada, możesz zmienić ją w ustawieniach.
+5. W ustawieniach, znajdują się również parametry funkcji na podstawie których wyszukiwane są piki. Funkcją tą jest scipy.find_peaks: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html
 
 ## Literatura
 1. Materiały ze strony brain.fuw.edu.pl do Pracowni Sygnałów Bioelektrycznych

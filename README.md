@@ -17,11 +17,11 @@ Potrzebne będą 3 elektrody monopolarne z wtyczką Touch Proof wraz z nalepkami
 Poniżej znajdują się zdjęcia referencyjne. 
 
 <div style="display: flex; justify-content: space-around;">
-    <img src="images/1.jpeg" alt="Obrazek 1" style="width: 25%; margin-right: 10px;" />
-    <img src="images/2.jpeg" alt="Obrazek 2" style="width: 25%;" />
+    <img src="assets/images/1.jpeg" alt="Obrazek 1" style="width: 25%; margin-right: 10px;" />
+    <img src="assets/images/2.jpeg" alt="Obrazek 2" style="width: 25%;" />
 </div>
 
-Elektrody należy umieścić na wewnętrznej części obu przedramion (elektrody bipolarne) oraz na wybranej nodze (najlepiej na wewnętrznej stronie, w pobliżu kostki) (referencja). Pamiętaj że przed przyklejeniem nalepki, skórę należy przemyć  alkoholem w celu zmniejszenia oporu (odtłuszczenia skóry).
+Elektrody należy umieścić na wewnętrznej części obu przedramion (elektrody bipolarne) oraz na wybranej nodze (najlepiej na wewnętrznej stronie, w pobliżu kostki) (referencja). Pamiętaj że przed przyklejeniem nalepki, skórę należy przemyć  alkoholem w celu zmniejszenia oporu (odtłuszczenia skóry). Ogranicz ruchy ciała, a przede wszystkim rąk do minimum. Najlepiej oprzyj je na podłokietnikach fotelx.
 
 2. **Wzmacniacz**
 
@@ -29,8 +29,8 @@ Potrzebny będzie wzmacniacz Perun firmy BrainTech. Instrukcja obsługi;
 https://braintech.pl/pliki/svarog/manuals/manual.pdf
 
 <div style="display: flex; justify-content: space-around;">
-    <img src="images/3.jpeg" alt="Obrazek 3" style="width: 25%; margin-right: 10px;" />
-    <img src="images/4.jpeg" alt="Obrazek 4" style="width: 25%;" />
+    <img src="assets/images/3.jpeg" alt="Obrazek 3" style="width: 25%; margin-right: 10px;" />
+    <img src="assets/images/4.jpeg" alt="Obrazek 4" style="width: 25%;" />
 </div>
 
 Wzmacniacz podłącz do komputera kablem USB - USB B tzw. kabel drukarkowy.
@@ -40,6 +40,8 @@ Wzmacniacz podłącz do komputera kablem USB - USB B tzw. kabel drukarkowy.
 Elektrody, które umieszczono na przedramionach tj. „Bipolarne” podłącz do portu nr 1 na wzmacniaczu. Jedna idzie do czerwonego a druga do czarnego wejścia (wybór losowy). Elektrodę, którą umieszczono na nodze tj. „Referencje” podłącz do jednego z portów opisanych jako GND (ground). (Porty białe lub żółte)
 
 ## Instalacja
+
+0. **Pobierz Svarog Streamer**
 
 1. **Sklonuj repozytorium:**
 
@@ -71,6 +73,17 @@ Elektrody, które umieszczono na przedramionach tj. „Bipolarne” podłącz do
     ```
 ## Uruchomienie aplikacji 
 Aby uruchomić aplikację, użyj następujących poleceń w terminalu, dostosowując opcjonalne argumenty w zależności od potrzeb.
+
+1. **Uruchom svarog_streamer:**
+    Znajdź nazwę podłączonego wzmacniacza
+    ```
+    svarog_streamer -l 
+    ```
+    Wypisze listę wzmacniaczy. Szukamy ID odpowiedniego wzmacniacza np: 
+    ```
+    Perun-8 Headset
+    id: "Perun8 1"
+    ```
 
 Opcjonalne argumenty:
 

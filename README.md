@@ -43,6 +43,9 @@ Elektrody, które umieszczono na przedramionach tj. „Bipolarne” podłącz do
 
 0. **Pobierz Svarog Streamer**
 
+    Oprogramowanie Svarog Streamer znajdziesz pod linkiem:
+    https://braintech.pl/software/svarog-streamer/
+
 1. **Sklonuj repozytorium:**
 
    ```bash
@@ -75,40 +78,48 @@ Elektrody, które umieszczono na przedramionach tj. „Bipolarne” podłącz do
 Aby uruchomić aplikację, użyj następujących poleceń w terminalu, dostosowując opcjonalne argumenty w zależności od potrzeb.
 
 1. **Uruchom svarog_streamer:**
+
     Znajdź nazwę podłączonego wzmacniacza
     ```
     svarog_streamer -l 
     ```
+
     Wypisze listę wzmacniaczy. Szukamy ID odpowiedniego wzmacniacza np: 
     ```
     Perun-8 Headset
     id: "Perun8 1"
     ```
 
-Opcjonalne argumenty:
+    W terminalu, uruchom svarog_streamer o podanych parametrach wpisując nazwę wzmacniacza, która pojawiła się w liście wzmacniaczy.
+    ```
+    svarog_streamer -a "Perun32 1" -n "nazwa_streamu" -s 500
+    ```
 
---mode: Tryb uruchomienia aplikacji. Dostępne opcje: online, offline. (Wymagane)
+2. **Uruchom aplikację APPreciation**
+    Opcjonalne argumenty:
 
---chunk_size: Rozmiar fragmentu danych do przetwarzania. Domyślna wartość: 16.
+    --mode: Tryb uruchomienia aplikacji. Dostępne opcje: online, offline. (Wymagane)
 
---Fs: Częstotliwość próbkowania. Domyślna wartość: 500.
+    --chunk_size: Rozmiar fragmentu danych do przetwarzania. Domyślna wartość: 16.
 
---channel: Numer kanału dla trybu online i offline. Domyślna wartość: 32.
+    --Fs: Częstotliwość próbkowania. Domyślna wartość: 500.
 
---s_path: Ścieżka do sygnału dla trybu offline. Domyślna wartość: test_perun.raw.
+    --channel: Numer kanału dla trybu online i offline. Domyślna wartość: 32.
 
-Przykładowe uruchomienia
-Tryb online:
+    --s_path: Ścieżka do sygnału dla trybu offline. Domyślna wartość: test_perun.raw.
 
-```bash
-python main.py --mode online --chunk_size 16 --Fs 500 --channel 23
-```
+    Przykładowe uruchomienia
+    Tryb online:
 
-Tryb offline:
+    ```bash
+    python main.py --mode online --chunk_size 16 --Fs 500 --channel 23
+    ```
 
-```bash
-python main.py --mode offline --chunk_size 16 --Fs 500 --n_ch 1 --channel 0 --s_path test_perun.raw
-```
+    Tryb offline:
+
+    ```bash
+    python main.py --mode offline --chunk_size 16 --Fs 500 --n_ch 1 --channel 0 --s_path test_perun.raw
+    ```
 
 
 ## Użycie aplikacji

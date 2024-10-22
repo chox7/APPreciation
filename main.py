@@ -3,8 +3,9 @@ import EKGProcessor as ekgp
 import EKGapp as ekgapp
 import argparse
 import test_signal as ts
+import json
 
-def run_online(chunk_size, Fs, channel, interval):
+def run_online(chunk_size, Fs, channel, interval, breathing_settings):
     # Start the LSL stream
     inlet = lsl.start_stream('stream_1')
 
@@ -14,7 +15,7 @@ def run_online(chunk_size, Fs, channel, interval):
     hrv_analyzer = ekgp.HRVAnalyzer(peaks_detector)
 
     # Run the application
-    ekgapp.run_dash_app_thread(processor, peaks_detector, hrv_analyzer, interval)
+    ekgapp.run_dash_app_thread(processor, peaks_detector, hrv_analyzer, interval, breathing_settings)
 
 def run_offline(chunk_size, Fs, s_path, n_ch, channel, channel_base, interval):
     # Generate the test signal
@@ -40,12 +41,15 @@ def main():
     parser.add_argument('--channel_base', type=int, default=-1, help="Base channel number")
     parser.add_argument('--s_path', type=str, default='test_perun.raw', help="Signal path for offline mode")
     parser.add_argument('--interval', type=int, default=1000, help="Application update interval")
+    parser.add_argument('--breating', type=str, default="{'hold_zero':15, 'inhale':10, 'hold_one':15, 'exhale':10, 'speed':-3, 'loops':10}")
 
     args = parser.parse_args()
 
+    breathing_settings = json.loads(args.breating)
+
     # Run the application in the selected mode
     if args.mode == 'online':
-        run_online(args.chunk_size, args.Fs, args.channel, args.interval)
+        run_online(args.chunk_size, args.Fs, args.channel, args.interval, breathing_settings)
     elif args.mode == 'offline':
         run_offline(args.chunk_size, args.Fs, args.s_path, args.n_ch, args.channel, args.channel_base, args.interval)
     else:

@@ -16,12 +16,12 @@ chart_settings = {
 }
 
 # Function to run the Dash app
-def run_dash_app_thread(signal_processor, peaks_detector, hrv_analyzer, interval):
-    app = run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval)
+def run_dash_app_thread(signal_processor, peaks_detector, hrv_analyzer, interval, breathing_settings):
+    app = run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval, breathing_settings)
     app.run_server(debug=True, port=8051, use_reloader=False)
 
 # Function to create the Dash app
-def run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval_value=1000):
+def run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval_value=1000, breathing_settings):
     app = dash.Dash(__name__)
     app.layout = html.Div([
         dcc.Tabs([
@@ -34,7 +34,7 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval_value=
                     dcc.Graph(id='live-graph-hr', style={'width': '25%', 'display': 'inline-block'}),
                     dcc.Graph(id='live-graph-hrv', style={'width': '25%', 'display': 'inline-block'}),
                     dcc.Graph(id='live-graph-coherence', style={'width': '25%', 'display': 'inline-block'}),
-                    dcc.Graph(id='breathing-scheme', figure=creating_ramp(info_from_user = False)),
+                    dcc.Graph(id='breathing-scheme', figure=creating_ramp(**breathing_settings, info_from_user = False)),
                     dcc.Interval(
                         id='interval-component',
                         interval= interval_value,  # in milliseconds

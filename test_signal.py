@@ -13,7 +13,6 @@ def signal_generator(s, channel, channel_base, fs, chunk_size):
                     syg = s[:, channel]
             else:
                 syg = s[:, channel] - s[:, channel_base]
-
             yield syg[i:i+chunk_size]
     except StopIteration:
         print("End of signal reached")

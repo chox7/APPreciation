@@ -48,7 +48,7 @@ class SignalProcessor:
 
         # Low-pass filter
         self.b_l, self.a_l = signal.iirfilter(self.lp_params['order'], self.lp_params['fc'],
-                                          self.hp_params['rp'], rs=self.lp_params['rs'],
+                                          self.lp_params['rp'], rs=self.lp_params['rs'],
                                           btype='lowpass', ftype='butter', output='ba', fs=self.sampling_rate)
         self.zi_l = signal.lfilter_zi(self.b_l, self.a_l)
 
@@ -66,7 +66,7 @@ class SignalProcessor:
     def set_lowpass_params(self, order, fc, rp, rs):
         self.lp_params['order'] = order
         self.lp_params['fc'] = fc
-        self.hp_params['rp'] = rp
+        self.lp_params['rp'] = rp
         self.lp_params['rs'] = rs
         self.update_filters()
 
@@ -79,11 +79,13 @@ class SignalProcessor:
         while self.running:
             if self.mode == 'online':
                 sample, _ = self.inlet.pull_chunk(timeout=1.0, max_samples=self.samps_per_chunk)
-                piece = np.array(sample)[:, self.channel]
+                if sample:
+                    piece = np.array(sample)[:, self.channel]
             elif self.mode == 'offline':
                 piece = np.array(next(self.inlet))
             
-            self.add_data(piece)    
+            if piece:
+                self.add_data(piece)    
 
     def add_data(self, new_data):
         with self.data_lock:
@@ -134,7 +136,7 @@ class PeaksDetector:
             self.find_peaks_setting = find_peaks_setting
 
         self.last_peak_index = -1 # index of the last peak in the data_buffer in seconds
-        self.peak_buffor_size = 50
+        self.peak_buffor_size = 500
         self.rr_intervals = deque(maxlen=self.peak_buffor_size-1) 
         self.peaks_time = deque(maxlen=self.peak_buffor_size)
         self.peaks_prominence = deque(maxlen=self.peak_buffor_size)
@@ -148,7 +150,7 @@ class PeaksDetector:
     def update_peaks_thread(self):
         while self.running:
             self.update_peaks()
-            time.sleep(1)   
+            time.sleep(1)
 
     def update_peaks(self):
         with self.signal_processor.data_lock:
@@ -278,13 +280,15 @@ class HRVAnalyzer:
 
         Fs_2 = 1
         t2 = np.arange(peaks[0], peaks[-2], 1/Fs_2)
-        p = np.polyfit(t2, RR_new(t2), deg=2)
-        t2 = np.arange(peaks[0], peaks[-2], 1/Fs_2)
         p = np.polyfit(t2, RR_new(t2), deg=3)
         f = np.polyval(p, t2)
         sig = RR_new(t2) - f
-        okno = signal.windows.hann(len(t2))
-        F, P = self.periodogram(sig, okno, Fs_2)   
+        k = 20
+        okno = signal.windows.hann(k *len(t2))
+
+        zero_padding_lenght = k * len(sig)
+        sig_padded = np.pad(sig, (0, zero_padding_lenght - len(sig)), 'constant')
+        F, P = self.periodogram(sig_padded, okno, Fs_2)   
         
         with self.hrv_lock:
             self.frequencies = F
@@ -314,15 +318,16 @@ class HRVAnalyzer:
         F1 = F[mask1]
         P1 = P[mask1]
         highest_peak_index = np.argmax(P1)
-        highest_peak_frame = [P1[highest_peak_index] - 0.015, P1[highest_peak_index] + 0.015]
-        highest_peak_arr = (P1 > highest_peak_frame[0]) & (P1 < highest_peak_frame[1])
+        highest_peak_frame = [F1[highest_peak_index] - 0.015, F1[highest_peak_index] + 0.015]
+        highest_peak_arr = (F1 > highest_peak_frame[0]) & (F1 < highest_peak_frame[1])
         peak_power = integrate.simps(P1[highest_peak_arr], F1[highest_peak_arr])
 
         mask2 = (F > 0.0033) & (F < 0.4)
         F2 = F[mask2]
         P2 = P[mask2]
         total_power = integrate.simps(P2, F2)           
-        coherence_value  = (peak_power/total_power)**2
+        coherence_value  = (peak_power/(total_power - peak_power))**2
+
         with self.coh_lock:
             self.coherence = ((1 / (np.sqrt(2 * np.pi))) * np.exp(-(self.x_coherence**2) / 2))
             self.coherence /= np.max(self.coherence)

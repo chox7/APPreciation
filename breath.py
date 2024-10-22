@@ -5,14 +5,6 @@ import plotly.graph_objects as go
 
 def creating_ramp(hold_zero=15, inhale=10, hold_one=15, exhale=10, speed=-3, loops=10, info_from_user=False, text_above_dot=True):
 
-    # Scheme settings can be set in function or by the user
-    if info_from_user:
-        hold_zero = int(input("Enter the 'hold_zero' time: "))
-        inhale = int(input("Enter the 'inhale' time: "))
-        hold_one = int(input("Enter the 'hold_one' time: "))
-        exhale = int(input("Enter the 'exhale' time: "))
-        speed = int(input("How fast should the exercise be? [0 - very slow, 1 - slow, medium, 2 - fast, 3 - very fast]. Enter the chosen --speed number-- :"))
-
     # One segment
     sig = np.concatenate((np.zeros(hold_zero // 2),
                           np.arange(0, 1, 1 / inhale),

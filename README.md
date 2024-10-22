@@ -9,8 +9,35 @@ Aplikacja pomagająca wejść w stan koherencji serca dzięki ćwiczeniom oddech
 * Monitorowanie tętna oraz zmienności rytmu zatokowego.
 * Wizualizacja poziomu koherencji serca
 
-## Wymagania
-* Wzmacniacz Perun_32
+## Przygotowanie badanego
+
+1. **Elektrody** 
+
+Potrzebne będą 3 elektrody monopolarne z wtyczką Touch Proof wraz z nalepkami do EKG (rekomendujemy nalepki firmy SKINTACT). 
+Poniżej znajdują się zdjęcia referencyjne. 
+
+<div style="display: flex; justify-content: space-around;">
+    <img src="images/1.jpeg" alt="Obrazek 1" style="width: 25%; margin-right: 10px;" />
+    <img src="images/2.jpeg" alt="Obrazek 2" style="width: 25%;" />
+</div>
+
+Elektrody należy umieścić na wewnętrznej części obu przedramion (elektrody bipolarne) oraz na wybranej nodze (najlepiej na wewnętrznej stronie, w pobliżu kostki) (referencja). Pamiętaj że przed przyklejeniem nalepki, skórę należy przemyć  alkoholem w celu zmniejszenia oporu (odtłuszczenia skóry).
+
+2. **Wzmacniacz**
+
+Potrzebny będzie wzmacniacz Perun firmy BrainTech. Instrukcja obsługi;
+https://braintech.pl/pliki/svarog/manuals/manual.pdf
+
+<div style="display: flex; justify-content: space-around;">
+    <img src="images/3.jpeg" alt="Obrazek 3" style="width: 25%; margin-right: 10px;" />
+    <img src="images/4.jpeg" alt="Obrazek 4" style="width: 25%;" />
+</div>
+
+Wzmacniacz podłącz do komputera kablem USB - USB B tzw. kabel drukarkowy.
+￼
+3. **Podłączenie elektrod do wzmacniacza**
+
+Elektrody, które umieszczono na przedramionach tj. „Bipolarne” podłącz do portu nr 1 na wzmacniaczu. Jedna idzie do czerwonego a druga do czarnego wejścia (wybór losowy). Elektrodę, którą umieszczono na nodze tj. „Referencje” podłącz do jednego z portów opisanych jako GND (ground). (Porty białe lub żółte)
 
 ## Instalacja
 

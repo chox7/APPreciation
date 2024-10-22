@@ -17,8 +17,8 @@ Potrzebne będą 3 elektrody monopolarne z wtyczką Touch Proof wraz z nalepkami
 Poniżej znajdują się zdjęcia referencyjne. 
 
 <div style="display: flex; justify-content: space-around;">
-    <img src="images/1.jpeg" alt="Obrazek 1" style="width: 300px; margin-right: 10px;" />
-    <img src="images/2.jpeg" alt="Obrazek 2" style="width: 300px;" />
+    <img src="images/1.jpeg" alt="Obrazek 1" style="width: 25%; margin-right: 10px;" />
+    <img src="images/2.jpeg" alt="Obrazek 2" style="width: 25%;" />
 </div>
 
 Elektrody należy umieścić na wewnętrznej części obu przedramion (elektrody bipolarne) oraz na wybranej nodze (najlepiej na wewnętrznej stronie, w pobliżu kostki) (referencja). Pamiętaj że przed przyklejeniem nalepki, skórę należy przemyć  alkoholem w celu zmniejszenia oporu (odtłuszczenia skóry).
@@ -29,8 +29,8 @@ Potrzebny będzie wzmacniacz Perun firmy BrainTech. Instrukcja obsługi;
 https://braintech.pl/pliki/svarog/manuals/manual.pdf
 
 <div style="display: flex; justify-content: space-around;">
-    <img src="images/3.jpeg" alt="Obrazek 3" style="width: 300px; margin-right: 10px;" />
-    <img src="images/4.jpeg" alt="Obrazek 4" style="width: 300px;" />
+    <img src="images/3.jpeg" alt="Obrazek 3" style="width: 25%; margin-right: 10px;" />
+    <img src="images/4.jpeg" alt="Obrazek 4" style="width: 25%;" />
 </div>
 
 Wzmacniacz podłącz do komputera kablem USB - USB B tzw. kabel drukarkowy.

@@ -84,8 +84,7 @@ class SignalProcessor:
             elif self.mode == 'offline':
                 piece = np.array(next(self.inlet))
             
-            if piece:
-                self.add_data(piece)    
+            self.add_data(piece)    
 
     def add_data(self, new_data):
         with self.data_lock:

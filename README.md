@@ -17,8 +17,8 @@ Potrzebne będą 3 elektrody monopolarne z wtyczką Touch Proof wraz z nalepkami
 Poniżej znajdują się zdjęcia referencyjne. 
 
 <div style="display: flex; justify-content: space-around;">
-<img src="assets/images/1.jpeg" alt="Obrazek 1" style="width: 25%; margin-right: 10px;" />
-<img src="assets/images/2.jpeg" alt="Obrazek 2" style="width: 25%;" />
+<img src="assets/images/1.jpeg" alt="Obrazek 1" style="width: 45%; margin-right: 10px;" />
+<img src="assets/images/2.jpeg" alt="Obrazek 2" style="width: 45%;" />
 </div>
 
 Elektrody należy umieścić na wewnętrznej części obu przedramion (elektrody bipolarne) oraz na wybranej nodze (najlepiej na wewnętrznej stronie, w pobliżu kostki) (referencja). Pamiętaj że przed przyklejeniem nalepki, skórę należy przemyć  alkoholem w celu zmniejszenia oporu (odtłuszczenia skóry). Ogranicz ruchy ciała, a przede wszystkim rąk do minimum. Najlepiej oprzyj je na podłokietnikach fotelx.

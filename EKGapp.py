@@ -16,12 +16,12 @@ chart_settings = {
 }
 
 # Function to run the Dash app
-def run_dash_app_thread(signal_processor, peaks_detector, hrv_analyzer, interval, breathing_settings):
-    app = run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval, breathing_settings)
+def run_dash_app_thread(signal_processor, peaks_detector, hrv_analyzer, interval, **breathing_settings):
+    app = run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval, **breathing_settings)
     app.run_server(debug=True, port=8051, use_reloader=False)
 
 # Function to create the Dash app
-def run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval_value=1000, breathing_settings):
+def run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval_value=1000, **breathing_settings):
     app = dash.Dash(__name__)
     app.layout = html.Div([
         dcc.Tabs([

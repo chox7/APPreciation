@@ -57,7 +57,7 @@ Opcjonalne argumenty:
 
 --s_path: Ścieżka do sygnału dla trybu offline. Domyślna wartość: test_perun.raw.
 
---breating: Ustawienia schematu oddechowego. Format słownika z argumentami odpowiednio:
+--breathing: Ustawienia schematu oddechowego. Format słownika z argumentami odpowiednio:
 
 * hold_zero - czas wstrzymania po wydechu
 

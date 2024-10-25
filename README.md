@@ -17,8 +17,8 @@ Potrzebne będą 3 elektrody monopolarne z wtyczką Touch Proof wraz z nalepkami
 Poniżej znajdują się zdjęcia referencyjne. 
 
 <div style="display: flex; justify-content: space-around;">
-    <img src="assets/images/1.jpeg" alt="Obrazek 1" style="width: 25%; margin-right: 10px;" />
-    <img src="assets/images/2.jpeg" alt="Obrazek 2" style="width: 25%;" />
+<img src="assets/images/1.jpeg" alt="Obrazek 1" style="width: 25%; margin-right: 10px;" />
+<img src="assets/images/2.jpeg" alt="Obrazek 2" style="width: 25%;" />
 </div>
 
 Elektrody należy umieścić na wewnętrznej części obu przedramion (elektrody bipolarne) oraz na wybranej nodze (najlepiej na wewnętrznej stronie, w pobliżu kostki) (referencja). Pamiętaj że przed przyklejeniem nalepki, skórę należy przemyć  alkoholem w celu zmniejszenia oporu (odtłuszczenia skóry). Ogranicz ruchy ciała, a przede wszystkim rąk do minimum. Najlepiej oprzyj je na podłokietnikach fotelx.
@@ -29,8 +29,8 @@ Potrzebny będzie wzmacniacz Perun firmy BrainTech. Instrukcja obsługi;
 https://braintech.pl/pliki/svarog/manuals/manual.pdf
 
 <div style="display: flex; justify-content: space-around;">
-    <img src="assets/images/3.jpeg" alt="Obrazek 3" style="width: 25%; margin-right: 10px;" />
-    <img src="assets/images/4.jpeg" alt="Obrazek 4" style="width: 25%;" />
+<img src="assets/images/3.jpeg" alt="Obrazek 3" style="width: 25%; margin-right: 10px;" />
+<img src="assets/images/4.jpeg" alt="Obrazek 4" style="width: 25%;" />
 </div>
 
 Wzmacniacz podłącz do komputera kablem USB - USB B tzw. kabel drukarkowy.
@@ -43,62 +43,68 @@ Elektrody, które umieszczono na przedramionach tj. „Bipolarne” podłącz do
 
 0. **Pobierz Svarog Streamer**
 
-    Oprogramowanie Svarog Streamer znajdziesz pod linkiem:
-    https://braintech.pl/software/svarog-streamer/
+Oprogramowanie Svarog Streamer znajdziesz pod linkiem:
+https://braintech.pl/software/svarog-streamer/
 
 1. **Sklonuj repozytorium:**
 
-   ```bash
-   git clone git@gitlab.com:neuroinf_uw_24/ekg_coherence.git
-   cd ekg_coherence
-   ```
+```bash
+git clone git@gitlab.com:neuroinf_uw_24/ekg_coherence.git
+cd ekg_coherence
+```
 
 2. **Uruchom skrypt instalacyjny:**
 
-    Dla macOS i Linux:
-    ```bash
-    bash setup.sh 
-    ```
-    Dla Windows:
-    ```bat
-    .\setup.bat      
-    ```
+Dla macOS i Linux:
+```bash
+bash setup.sh 
+```
+Dla Windows:
+```bat
+.\setup.bat      
+```
 
 3. **Aktywuj wirtualne środowisko:**
 
-    Dla macOS i Linux:
-    ```bash
-    source .venv/bin/activate 
-    ```
-    Dla Windows:
-    ```PowerShell
-    .venv\Scripts\activate
-    ```
+Dla macOS i Linux:
+```bash
+source .venv/bin/activate 
+```
+Dla Windows:
+```PowerShell
+.venv\Scripts\activate
+```
 ## Uruchomienie aplikacji 
 Aby uruchomić aplikację, użyj następujących poleceń w terminalu, dostosowując opcjonalne argumenty w zależności od potrzeb.
 
 1. **Uruchom svarog_streamer:**
 
-    Znajdź nazwę podłączonego wzmacniacza
-    ```
-    svarog_streamer -l 
-    ```
+Znajdź nazwę podłączonego wzmacniacza
+```
+svarog_streamer -l 
+```
 
-    Wypisze listę wzmacniaczy. Szukamy ID odpowiedniego wzmacniacza np: 
-    ```
-    Perun-8 Headset
-    id: "Perun8 1"
-    ```
+Wypisze listę wzmacniaczy. Szukamy ID odpowiedniego wzmacniacza np: 
+```
+Perun-8 Headset
+id: "Perun8 1"
+```
 
-    W terminalu, uruchom svarog_streamer o podanych parametrach wpisując nazwę wzmacniacza, która pojawiła się w liście wzmacniaczy.
-    ```
-    svarog_streamer -a "Perun32 1" -n "nazwa_streamu" -s 500
-    ```
+W terminalu, uruchom svarog_streamer o podanych parametrach wpisując nazwę wzmacniacza, która pojawiła się w liście wzmacniaczy.
+```
+svarog_streamer -a "Perun32 1" -n "nazwa_streamu" -s 500
+```
 
 2. **Uruchom aplikację APPreciation**
-    Opcjonalne argumenty:
+Opcjonalne argumenty:
 
-    --mode: Tryb uruchomienia aplikacji. Dostępne opcje: online, offline. (Wymagane)
+--mode: Tryb uruchomienia aplikacji. Dostępne opcje: online, offline. (Wymagane)
+
+--Fs: Częstotliwość próbkowania. Domyślna wartość: 500.
+
+--channel: Numer kanału dla trybu online i offline. Domyślna wartość: 32.
+
+--s_path: Ścieżka do sygnału dla trybu offline. Domyślna wartość: test_perun.raw.
 
 --breathing: Ustawienia schematu oddechowego. Format słownika z argumentami odpowiednio:
 
@@ -119,24 +125,15 @@ Aby uruchomić aplikację, użyj następujących poleceń w terminalu, dostosowu
 ### Przykładowe uruchomienia
 Tryb online:
 
-    --Fs: Częstotliwość próbkowania. Domyślna wartość: 500.
+```bash
+python main.py --mode online --chunk_size 16 --Fs 500 --channel 23
+```
 
-    --channel: Numer kanału dla trybu online i offline. Domyślna wartość: 32.
+Tryb offline:
 
-    --s_path: Ścieżka do sygnału dla trybu offline. Domyślna wartość: test_perun.raw.
-
-    Przykładowe uruchomienia
-    Tryb online:
-
-    ```bash
-    python main.py --mode online --chunk_size 16 --Fs 500 --channel 23
-    ```
-
-    Tryb offline:
-
-    ```bash
-    python main.py --mode offline --chunk_size 16 --Fs 500 --n_ch 1 --channel 0 --s_path test_perun.raw
-    ```
+```bash
+python main.py --mode offline --chunk_size 16 --Fs 500 --n_ch 1 --channel 0 --s_path test_perun.raw
+```
 
 
 ## Użycie aplikacji

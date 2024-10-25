@@ -100,18 +100,23 @@ Aby uruchomić aplikację, użyj następujących poleceń w terminalu, dostosowu
 
     --mode: Tryb uruchomienia aplikacji. Dostępne opcje: online, offline. (Wymagane)
 
---breating: Ustawienia schematu oddechowego. Format słownika z argumentami odpowiednio:
-    - hold_zero - czas wstrzymania po wydechu
-    - inhale - czas wdechu
-    - hold_one - czas wstrzymania po wdechu
-    - exhale - czas wydechu
-    - speed - prędkość ([0 - very slow, 1 - slow, medium, 2 - fast, 3 - very fast])
-    - loops - liczba powtórzeń schematu do zatrzymania
+--breathing: Ustawienia schematu oddechowego. Format słownika z argumentami odpowiednio:
 
-    Domyślna wartość:
-    {'hold_zero':15, 'inhale':10, 'hold_one':15, 'exhale':10, 'speed':-3, 'loops':10}
+* hold_zero - czas wstrzymania po wydechu
 
-Przykładowe uruchomienia
+* inhale - czas wdechu
+
+* hold_one - czas wstrzymania po wdechu
+
+* exhale - czas wydechu
+
+* speed - prędkość ([0 - very slow, 1 - slow, medium, 2 - fast, 3 - very fast])
+
+* loops - liczba powtórzeń schematu
+
+* Domyślna wartość: {'hold_zero':15, 'inhale':10, 'hold_one':15, 'exhale':10, 'speed':-3, 'loops':10}
+
+### Przykładowe uruchomienia
 Tryb online:
 
     --Fs: Częstotliwość próbkowania. Domyślna wartość: 500.

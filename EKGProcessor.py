@@ -355,3 +355,4 @@ class HRVAnalyzer:
         self.running = False
         self.hrv_thread.join()
         self.coh_thread.join()
+        

@@ -17,7 +17,7 @@ Potrzebne będą 3 elektrody monopolarne z wtyczką Touch Proof wraz z nalepkami
 Poniżej znajdują się zdjęcia referencyjne. 
 
 <div style="display: flex; justify-content: space-around;">
-<img src="assets/images/1.jpeg" alt="Obrazek 1" style="width: 45%; margin-right: 10px;" />
+<img src="assets/images/1.jpeg" alt="Obrazek 1" style="width: 45%;" />
 <img src="assets/images/2.jpeg" alt="Obrazek 2" style="width: 45%;" />
 </div>
 
@@ -29,8 +29,8 @@ Potrzebny będzie wzmacniacz Perun firmy BrainTech. Instrukcja obsługi;
 https://braintech.pl/pliki/svarog/manuals/manual.pdf
 
 <div style="display: flex; justify-content: space-around;">
-<img src="assets/images/3.jpeg" alt="Obrazek 3" style="width: 25%; margin-right: 10px;" />
-<img src="assets/images/4.jpeg" alt="Obrazek 4" style="width: 25%;" />
+<img src="assets/images/3.jpeg" alt="Obrazek 3" style="width: 45%;" />
+<img src="assets/images/4.jpeg" alt="Obrazek 4" style="width: 45%;" />
 </div>
 
 Wzmacniacz podłącz do komputera kablem USB - USB B tzw. kabel drukarkowy.

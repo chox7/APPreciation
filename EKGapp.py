@@ -173,11 +173,47 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval_value=
                 html.Div([
                     html.H3('Informacje o aplikacji - APPreciation'),
                     html.P('Aplikacja pomagająca wejść w stan koherencji serca dzięki ćwiczeniom oddechowym.'),
-                    html.P('Koherencja serca to stan głębokiego spokoju, w którym rytm serca synchronizuje się z oddechem.' +
-                           ' Tętno lekko przyspiesza podczas wdechu i zwalnia podczas wydechu. Pomóc w osiągnięciu tego stanu' +
-                           ' może ćwiczenie polegające na wykonywaniu wolnych i spokojnych oddechów. Korzyści z koherencji serca są liczne.' +
-                           ' Ciało i umysł regenerują się, poprawiają się pamięć i koncentracja, a także odczuwa się więcej pozytywnych emocji takich jak radość i wdzięczność.' +
-                           ' Dodatkowo obniżają się ciśnienie krwi i poziom kortyzolu, co w efekcie zmniejsza poziom stresu.')
+                    html.P('Koherencja serca to stan głębokiego spokoju, w którym rytm serca synchronizuje się z oddechem.'+
+                           ' Tętno lekko przyspiesza podczas wdechu i zwalnia podczas wydechu. Pomóc w osiągnięciu tego stanu'+
+                            ' może ćwiczenie polegające na wykonywaniu wolnych i spokojnych oddechów. Korzyści z koherencji serca są liczne.'+
+                            ' Ciało i umysł regenerują się, poprawiają się pamięć i koncentracja, a także odczuwa się więcej pozytywnych emocji takich jak radość i wdzięczność.'+
+                            ' Dodatkowo obniżają się ciśnienie krwi i poziom kortyzolu, co w efekcie zmniejsza poziom stresu.'),
+                    html.P(),
+                    html.H3('Funkcje'),
+                    html.Ul([
+                        html.Li('Ćwiczenie oddechowe, które pomoże zsynchronizować oddech z rytmem serca.'),
+                        html.Li('Możliwość spersonalizowania długości wdechu i wydechu do indywidualnych potrzeb.'),
+                        html.Li('Monitorowanie tętna oraz zmienności rytmu zatokowego.'),
+                        html.Li('Wizualizacja poziomu koherencji serca.')
+                    ]),
+                    html.H3('Przygotowanie badanego'),
+                    html.H5('1. Elektrody'),
+                    html.P('Potrzebne będą 3 elektrody monopolarne z wtyczką Touch Proof wraz z nalepkami do EKG (rekomendujemy nalepki firmy SKINTACT). '
+                        'Poniżej znajdują się zdjęcia referencyjne.'),
+                    
+                    html.Div(style={'display': 'flex', 'justify-content': 'space-around'}, children=[
+                        html.Img(src='/assets/images/1.jpeg', alt='Obrazek 1', style={'width': '25%', 'margin-right': '10px'}),
+                        html.Img(src='/assets/images/2.jpeg', alt='Obrazek 2', style={'width': '25%'})
+                    ]),
+                    
+                    html.P('Elektrody należy umieścić na wewnętrznej części obu przedramion (elektrody bipolarne) oraz na wybranej nodze (najlepiej na wewnętrznej stronie, w pobliżu kostki). '
+                        'Pamiętaj że przed przyklejeniem nalepki, skórę należy przemyć alkoholem w celu zmniejszenia oporu (odtłuszczenia skóry).'),
+                    
+                    html.H5('2. Wzmacniacz'),
+                    html.P('Potrzebny będzie wzmacniacz Perun firmy BrainTech. Instrukcja obsługi:'),
+                    html.A('https://braintech.pl/pliki/svarog/manuals/manual.pdf', href='https://braintech.pl/pliki/svarog/manuals/manual.pdf'),
+                    
+                    html.Div(style={'display': 'flex', 'justify-content': 'space-around'}, children=[
+                        html.Img(src='/assets/images/3.jpeg', alt='Obrazek 3', style={'width': '25%', 'margin-right': '10px'}),
+                        html.Img(src='/assets/images/4.jpeg', alt='Obrazek 4', style={'width': '25%'})
+                    ]),
+                    
+                    html.P('Wzmacniacz podłącz do komputera kablem USB - USB B tzw. kabel drukarkowy.'),
+                    
+                    html.H5('3. Podłączenie elektrod do wzmacniacza'),
+                    html.P('Elektrody, które umieszczono na przedramionach, podłącz do portu nr 1 na wzmacniaczu. '
+                        'Jedna idzie do czerwonego, a druga do czarnego wejścia (wybór losowy). Elektrodę umieszczoną na nodze '
+                        'podłącz do jednego z portów opisanych jako GND (ground). (Porty białe lub żółte).')
                 ])
             ])
         ])

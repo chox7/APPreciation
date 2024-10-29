@@ -49,7 +49,7 @@ https://braintech.pl/software/svarog-streamer/
 1. **Sklonuj repozytorium:**
 
 ```bash
-git clone git@gitlab.com:neuroinf_uw_24/ekg_coherence.git
+git clone https://github.com/chox7/APPreciation.git
 cd ekg_coherence
 ```
 

@@ -319,12 +319,12 @@ class HRVAnalyzer:
         highest_peak_index = np.argmax(P1)
         highest_peak_frame = [F1[highest_peak_index] - 0.015, F1[highest_peak_index] + 0.015]
         highest_peak_arr = (F1 > highest_peak_frame[0]) & (F1 < highest_peak_frame[1])
-        peak_power = integrate.simps(P1[highest_peak_arr], F1[highest_peak_arr])
+        peak_power = integrate.simpson(P1[highest_peak_arr], x=F1[highest_peak_arr])
 
         mask2 = (F > 0.0033) & (F < 0.4)
         F2 = F[mask2]
         P2 = P[mask2]
-        total_power = integrate.simps(P2, F2)           
+        total_power = integrate.simpson(P2, x=F2)           
         coherence_value  = (peak_power/(total_power - peak_power))**2
 
         with self.coh_lock:

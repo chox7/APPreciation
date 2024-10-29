@@ -51,7 +51,7 @@ def main():
     if args.mode == 'online':
         run_online(args.chunk_size, args.Fs, args.channel, args.interval, **breathing_settings)
     elif args.mode == 'offline':
-        run_offline(args.chunk_size, args.Fs, args.s_path, args.n_ch, args.channel, args.channel_base, args.interval)
+        run_offline(args.chunk_size, args.Fs, args.s_path, args.n_ch, args.channel, args.channel_base, args.interval, **breathing_settings)
     else:
         print("Invalid mode selected. Use 'online' or 'offline'.")
 

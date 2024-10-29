@@ -50,7 +50,7 @@ https://braintech.pl/software/svarog-streamer/
 
 ```bash
 git clone https://github.com/chox7/APPreciation.git
-cd ekg_coherence
+cd APPreciation
 ```
 
 2. **Uruchom skrypt instalacyjny:**

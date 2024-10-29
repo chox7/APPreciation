@@ -120,7 +120,7 @@ Opcjonalne argumenty:
 
 * loops - liczba powtórzeń schematu
 
-* Domyślna wartość: {'hold_zero':15, 'inhale':10, 'hold_one':15, 'exhale':10, 'speed':-3, 'loops':10}
+* Domyślna wartość: '{"hold_zero":15, "inhale":10, "hold_one":15, "exhale":10, "speed":-3, "loops":10}'
 
 ### Przykładowe uruchomienia
 Tryb online:

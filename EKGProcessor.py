@@ -135,7 +135,7 @@ class PeaksDetector:
             self.find_peaks_setting = find_peaks_setting
 
         self.last_peak_index = -1 # index of the last peak in the data_buffer in seconds
-        self.peak_buffor_size = 500
+        self.peak_buffor_size = 160
         self.rr_intervals = deque(maxlen=self.peak_buffor_size-1) 
         self.peaks_time = deque(maxlen=self.peak_buffor_size)
         self.peaks_prominence = deque(maxlen=self.peak_buffor_size)
@@ -325,7 +325,7 @@ class HRVAnalyzer:
         F2 = F[mask2]
         P2 = P[mask2]
         total_power = integrate.simpson(P2, x=F2)           
-        coherence_value  = (peak_power/(total_power - peak_power))**2
+        coherence_value  = peak_power/total_power
 
         with self.coh_lock:
             self.coherence = ((1 / (np.sqrt(2 * np.pi))) * np.exp(-(self.x_coherence**2) / 2))

@@ -11,7 +11,7 @@ chart_settings = {
         'range': [-500, 2000],
     },
     'hr': {
-        'range': [20, 200],
+        'range': [50, 150],
     }
 }
 
@@ -312,7 +312,6 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval_value=
             mode='lines',
             name='Heart Rate'
         )
-        
         return {
             'data': [hr_trace],
             'layout': go.Layout(
@@ -425,6 +424,10 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval_value=
     @app.callback(
         Output('dummy-output', 'children'),
         [Input('sampling-rate-input', 'value'),
+        Input('hr-range-1', 'value'),
+        Input('hr-range-2', 'value'),
+        Input('ekg-range-1', 'value'),
+        Input('ekg-range-2', 'value'),
         Input('hp-order-input', 'value'),
         Input('hp-fc-input', 'value'),
         Input('hp-rp-input', 'value'),
@@ -443,6 +446,7 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval_value=
     )
     def save_settings(
             sampling_rate,
+            hr_low, hr_high, ekg_low, ekg_high,
             hp_order, hp_fc, hp_rp, hp_rs,
             lp_order, lp_fc, lp_rp, lp_rs,
             notch_f0, notch_q,
@@ -450,6 +454,10 @@ def run_dash_app(signal_processor, peaks_detector, hrv_analyzer, interval_value=
     ):  
         print('Settings saved.')
         signal_processor.sampling_rate = sampling_rate
+        chart_settings['hr']['range'][0] = hr_low
+        chart_settings['hr']['range'][1] = hr_high
+        chart_settings['ekg']['range'][0] = ekg_low
+        chart_settings['ekg']['range'][1] = ekg_high
         signal_processor.hp_params = {'order': hp_order, 'fc': hp_fc, 'rp': hp_rp, 'rs': hp_rs}
         signal_processor.lp_params = {'order': lp_order, 'fc': lp_fc, 'rp': lp_rp, 'rs': lp_rs}
         signal_processor.notch_params = {'f0': notch_f0, 'Q': notch_q}
